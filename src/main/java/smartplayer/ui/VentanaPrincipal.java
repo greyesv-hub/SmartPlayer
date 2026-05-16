@@ -292,7 +292,7 @@ public class VentanaPrincipal extends JFrame {
         return panel;
     }
 
-    // ── Pestaña Estadísticas ───────────────────────────────────────────────
+    // ── Pestaña Estadisticas ───────────────────────────────────────────────
 
     private JPanel crearPestanaEstadisticas() {
         JPanel panel = new JPanel(new BorderLayout(8, 8));
@@ -377,7 +377,7 @@ public class VentanaPrincipal extends JFrame {
         // Info de la canción
         JPanel panelInfo = new JPanel(new GridLayout(2, 1));
         panelInfo.setBackground(COLOR_PANEL);
-        lblCancionActual = new JLabel("Sin reproducción");
+        lblCancionActual = new JLabel("Sin reproduccion");
         lblCancionActual.setForeground(COLOR_TEXTO);
         lblCancionActual.setFont(FUENTE_TITULO);
         lblArtista = new JLabel("—");
@@ -434,7 +434,7 @@ public class VentanaPrincipal extends JFrame {
     private void accionCargarBiblioteca() {
         JFileChooser fc = new JFileChooser();
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        fc.setDialogTitle("Selecciona la carpeta de música");
+        fc.setDialogTitle("Selecciona la carpeta de musica");
         if (fc.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) return;
 
         String ruta = fc.getSelectedFile().getAbsolutePath();
