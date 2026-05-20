@@ -362,7 +362,7 @@ public class VentanaPrincipal extends JFrame {
     }
 
     //  Panel Reproductor 
-    private JPanel crearPanelReproductor() {
+    private JPanel crearPanelReproductor() {//construye el reproductor visual 
         JPanel panel = new JPanel(new BorderLayout(8, 0));
         panel.setBackground(COLOR_PANEL);
         panel.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
@@ -396,7 +396,7 @@ public class VentanaPrincipal extends JFrame {
         panelBotones.add(btnPrev); panelBotones.add(btnPlay);
         panelBotones.add(btnPause); panelBotones.add(btnStop); panelBotones.add(btnNext);
 
-        barraProgreso = new JProgressBar(0, 100);
+        barraProgreso = new JProgressBar(0, 100);//simula avance de la cancion 
         barraProgreso.setForeground(COLOR_ACENTO);
         barraProgreso.setBackground(new Color(50, 50, 50));
         barraProgreso.setStringPainted(false);
@@ -407,7 +407,7 @@ public class VentanaPrincipal extends JFrame {
         // Controles de modo
         JPanel panelModo = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
         panelModo.setBackground(COLOR_PANEL);
-        comboModo = new JComboBox<>(new String[]{"▶ Normal","🔀 Aleatorio","🔁 Circular"});
+        comboModo = new JComboBox<>(new String[]{"▶ Normal","🔀 Aleatorio","🔁 Circular"});//modos de reproduccion 
         estilizar(comboModo);
         lblTiempo = new JLabel("00:00");
         lblTiempo.setForeground(COLOR_TEXTO_SEC);
@@ -415,9 +415,9 @@ public class VentanaPrincipal extends JFrame {
         panelModo.add(comboModo);
         panelModo.add(lblTiempo);
 
-        panel.add(panelInfo,     BorderLayout.WEST);
+        panel.add(panelInfo, BorderLayout.WEST);
         panel.add(panelControles,BorderLayout.CENTER);
-        panel.add(panelModo,     BorderLayout.EAST);
+        panel.add(panelModo, BorderLayout.EAST); 
         return panel;
     }
 
@@ -426,24 +426,24 @@ public class VentanaPrincipal extends JFrame {
     // ══════════════════════════════════════════════════════════════════════
 
     private void accionCargarBiblioteca() {
-        JFileChooser fc = new JFileChooser();
-        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        JFileChooser fc = new JFileChooser();//abre el explorador de archivos 
+        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);//solo permite elegir carpetas 
         fc.setDialogTitle("Selecciona la carpeta de musica");
         if (fc.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) return;
 
         String ruta = fc.getSelectedFile().getAbsolutePath();
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
-        SwingWorker<List<Cancion>, Void> worker = new SwingWorker<>() {
-            @Override protected List<Cancion> doInBackground() {
+        SwingWorker<List<Cancion>, Void> worker = new SwingWorker<>(){ //ejecuta procesos pesados sin congelar la interfaz
+            @Override protected List<Cancion> doInBackground(){ //donde se cargan las canciones 
                 return biblioteca.cargarDesde(ruta);
             }
-            @Override protected void done() {
+            @Override protected void done() {//se ejecuta al terminar 
                 try {
                     List<Cancion> canciones = get();
-                    refrescarTablaBiblioteca(canciones);
-                    JOptionPane.showMessageDialog(VentanaPrincipal.this,
-                        "✅ Cargadas " + canciones.size() + " canciones.\n",
+                    ActualizarTablaBiblioteca(canciones);//actualiza la tabla 
+                    JOptionPane.showMessageDialog(VentanaPrincipal.this,//muestra el mensaje 
+                        " Cargadas " + canciones.size() + " canciones\n",
                         "Carga completada", JOptionPane.INFORMATION_MESSAGE);
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(VentanaPrincipal.this,
@@ -460,25 +460,25 @@ public class VentanaPrincipal extends JFrame {
     //  HELPERS DE UI
     // ══════════════════════════════════════════════════════════════════════
 
-    private void refrescarTablaBiblioteca(List<Cancion> canciones) {
-        modeloBiblioteca.setRowCount(0);
+    private void ActualizarTablaBiblioteca(List<Cancion> canciones) {//lena la tabla con la lista de las canciones 
+        modeloBiblioteca.setRowCount(0);//elimina las filas anteriores 
         Iterable<Cancion> fuente = (canciones != null)
                 ? canciones
                 : biblioteca.getListaBiblioteca();
         for (Cancion c : fuente) {
-            modeloBiblioteca.addRow(new Object[]{
+            modeloBiblioteca.addRow(new Object[]{//inserta los datos 
                 c.getNombre(), c.getArtista(), c.getAlbum(), c.getGenero(),
                 c.getDuracionFormateada(), c.getTamanoFormateado(), c.getAnio(), c.getRuta()
             });
         }
     }
 
-    private JTable crearTabla(DefaultTableModel modelo) {
-        JTable tabla = new JTable(modelo) {
-            @Override public Component prepareRenderer(TableCellRenderer r, int row, int col) {
+    private JTable crearTabla(DefaultTableModel modelo){//personaliza la tabla 
+        JTable tabla = new JTable(modelo){
+            @Override public Component prepareRenderer(TableCellRenderer r, int row, int col){//personaliza los colores de las filas 
                 Component c = super.prepareRenderer(r, row, col);
                 c.setBackground(isRowSelected(row) ? COLOR_ACENTO
-                        : (row % 2 == 0 ? COLOR_FILA_PAR : COLOR_FILA_IMPAR));
+                        : (row % 2 == 0 ? COLOR_FILA_PAR : COLOR_FILA_IMPAR));//alterna la filas y hace un estilo tipo zebra 
                 c.setForeground(isRowSelected(row) ? Color.WHITE : COLOR_TEXTO);
                 return c;
             }
@@ -505,13 +505,13 @@ public class VentanaPrincipal extends JFrame {
         btn.setBorder(BorderFactory.createEmptyBorder(6, 14, 6, 14));
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btn.addMouseListener(new MouseAdapter() {
-            @Override public void mouseEntered(MouseEvent e) { btn.setBackground(color.brighter()); }
+            @Override public void mouseEntered(MouseEvent e) { btn.setBackground(color.brighter()); }//cuando el mouse entra o sale 
             @Override public void mouseExited(MouseEvent e)  { btn.setBackground(color); }
         });
         return btn;
     }
 
-    private JButton crearBotonIcono(String icono) {
+    private JButton crearBotonIcono(String icono) {//hace botones con emojis 
         JButton btn = new JButton(icono);
         btn.setBackground(COLOR_PANEL);
         btn.setForeground(COLOR_TEXTO);
@@ -533,7 +533,7 @@ public class VentanaPrincipal extends JFrame {
         if (c instanceof JTextField) ((JTextField)c).setCaretColor(COLOR_TEXTO);
     }
 
-    private void titularPanel(JComponent panel, String titulo) {
+    private void titularPanel(JComponent panel, String titulo) {//agregar borde con titulos 
         TitledBorder border = BorderFactory.createTitledBorder(
             BorderFactory.createLineBorder(COLOR_ACENTO, 1),
             titulo, TitledBorder.LEFT, TitledBorder.TOP,
@@ -547,8 +547,8 @@ public class VentanaPrincipal extends JFrame {
 
     public static void main(String[] args) {
         try {
-            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());//configura apariencia visual
         } catch (Exception ignored) {}
-        SwingUtilities.invokeLater(VentanaPrincipal::new);
+        SwingUtilities.invokeLater(VentanaPrincipal::new);//inicia la interfaz correctamente en el hilo grafico     
     }
 }
