@@ -1,31 +1,31 @@
 package smartplayer.structures;
 
-import java.util.Iterator;
+import java.util.Iterator;//funciona para que rrecorra la lista 
 import java.util.NoSuchElementException;
-import java.util.function.Predicate;
+import java.util.function.Predicate;//funciona para usar condiciones de busqueda 
 
 /**
- * Lista Simple enlazada genérica.
+ * Lista Simple enlazada generica.
  * Implementación manual sin uso de java.util.LinkedList.
  */
-public class ListaSimple<T> implements Iterable<T> {
-
-    // ── Nodo interno ───────────────────────────────────────────────────────
-    private static class Nodo<T> {
+public class ListaSimple<T> implements Iterable<T> {//<T> es una clase generica puede almacenar: String, integer, cancion 
+                                        //Interable<T> pemite usar for(T dato : lista)
+    //  Nodo interno 
+    private static class Nodo<T> {// Por que es static? Porque el nodo no necesita acceder a variables de la lista
         T dato;
         Nodo<T> siguiente;
-        Nodo(T dato) { this.dato = dato; }
+        Nodo(T dato) { this.dato = dato; } //porque es private? para que funciona?
     }
 
-    private Nodo<T> cabeza;
+    private Nodo<T> cabeza; //Nodo es private porque solo debe usarse en la ListaSimple 
     private int tamano;
 
-    // ── Inserción ──────────────────────────────────────────────────────────
+    //  Insercion 
 
     public void agregarInicio(T dato) {
         Nodo<T> nuevo = new Nodo<>(dato);
         nuevo.siguiente = cabeza;
-        cabeza = nuevo;
+        cabeza = nuevo;         //por que este es publico?
         tamano++;
     }
 
@@ -40,10 +40,10 @@ public class ListaSimple<T> implements Iterable<T> {
         tamano++;
     }
 
-    // ── Eliminación ────────────────────────────────────────────────────────
+    //  Eliminacion 
 
     public T eliminarInicio() {
-        if (cabeza == null) throw new NoSuchElementException("Lista vacía");
+        if (cabeza == null) throw new NoSuchElementException("Lista vacia");
         T dato = cabeza.dato;
         cabeza = cabeza.siguiente;
         tamano--;
@@ -65,7 +65,7 @@ public class ListaSimple<T> implements Iterable<T> {
         return false;
     }
 
-    // ── Búsqueda ───────────────────────────────────────────────────────────
+    //  Busqueda 
 
     public T buscar(Predicate<T> condicion) {
         Nodo<T> actual = cabeza;
@@ -85,7 +85,7 @@ public class ListaSimple<T> implements Iterable<T> {
         return false;
     }
 
-    // ── Acceso ─────────────────────────────────────────────────────────────
+    //  Acceso 
 
     public T getPrimero() {
         if (cabeza == null) return null;
@@ -105,7 +105,7 @@ public class ListaSimple<T> implements Iterable<T> {
 
     public void limpiar() { cabeza = null; tamano = 0; }
 
-    // ── Iterador ───────────────────────────────────────────────────────────
+    //  Iterador 
 
     @Override
     public Iterator<T> iterator() {
