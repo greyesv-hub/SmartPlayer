@@ -4,6 +4,8 @@
  */
 package smartplayer.structures;
 
+import java.util.EmptyStackException;
+
 /**
  *Usada para el historial de reproduccion 
  * @author rmari
@@ -25,4 +27,24 @@ public class Pila <T> {
         nuevo.siguiente = tope;
         tope = nuevo; tamano++;
     }
+        // desapila el elemento del tope
+    public T pop() {
+        if (isEmpty()) throw new EmptyStackException();
+        T dato = tope.dato;
+        tope = tope.siguiente;
+        tamano--;
+        return dato;
+    }
+
+    // devuelve el tope sin desapilar 
+    public T peek() {
+        if (isEmpty()) throw new EmptyStackException();
+        return tope.dato;
+    }
+
+    public boolean isEmpty() { return tope == null; }
+    public int getTamano()   { return tamano; }
+
+    public void limpiar() { tope = null; tamano = 0; }
+
 }
