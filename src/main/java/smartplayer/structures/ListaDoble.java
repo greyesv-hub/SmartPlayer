@@ -4,6 +4,8 @@
  */
 package smartplayer.structures;
 
+import java.util.function.Predicate;
+
 /**
  *
  * @author rmari
@@ -24,48 +26,49 @@ public class ListaDoble<T> implements Iterable<T> {
     private int tamano;
     
       // Insercion 
-
     public void agregarInicio(T dato) {
         Nodo<T> nuevo = new Nodo<>(dato);
-        if (cabeza == null) { cabeza = cola = nuevo; }
-        else {
+        if (cabeza == null){ 
+            cabeza = cola = nuevo; 
+        }else {
             nuevo.siguiente = cabeza;
             cabeza.anterior = nuevo;
             cabeza = nuevo;
         }
-        if (actual == null) actual = cabeza;
-        tamano++;
+        if (actual == null) actual = cabeza; tamano++;// Si no hay nodo actual: se coloca al inicio
     }
 
     public void agregarFinal(T dato) {
         Nodo<T> nuevo = new Nodo<>(dato);
-        if (cola == null) { cabeza = cola = nuevo; }
-        else {
+        if (cola == null){ 
+            cabeza = cola = nuevo;
+        }else {
             cola.siguiente = nuevo;
             nuevo.anterior = cola;
             cola = nuevo;
         }
-        if (actual == null) actual = cabeza;
-        tamano++;
+        if (actual == null) actual = cabeza; tamano++;
     }
     
     // Eliminacion
-
-    public boolean eliminarPorValor(T dato) {
-        if (dato == null) return false;
-        Nodo<T> n = buscarNodo(d -> d.equals(dato));
-        if (n == null) return false;
+    public boolean eliminarPorValor(T dato) {//Busca y elimina un dato
+        if (dato == null) 
+       return false;
+        Nodo<T> n = buscarNodo(d -> d.equals(dato));//buscar un nodo cuyo dato sea igual al recibido
+        if (n == null)
+       return false;
         eliminarNodo(n);
         return true;
     }
-
     private void eliminarNodo(Nodo<T> n) {
-        if (n.anterior != null) n.anterior.siguiente = n.siguiente;
+        if (n.anterior != null) 
+            n.anterior.siguiente = n.siguiente;
         else cabeza = n.siguiente;
-        if (n.siguiente != null) n.siguiente.anterior = n.anterior;
+        if (n.siguiente != null) 
+            n.siguiente.anterior = n.anterior;
         else cola = n.anterior;
-        if (actual == n) actual = (n.siguiente != null) ? n.siguiente : n.anterior;
-        tamano--;
+        if (actual == n) 
+            actual = (n.siguiente != null) ? n.siguiente : n.anterior; tamano--;
     }
     
     // Regresa el dato actual y avanza al siguiente 
@@ -75,5 +78,41 @@ public class ListaDoble<T> implements Iterable<T> {
         actual = actual.siguiente;
         return dato;
     }
+     // Regresa el dato actual y retrocede al anterior 
+    public T anterior() {
+        if (actual == null) return null;
+        T dato = actual.dato;
+        actual = actual.anterior;
+        return dato;
+    }
+
+    public T getActual() { return (actual != null) ? actual.dato : null; }
+
+    public void irAlInicio() { actual = cabeza; }
+    public void irAlFinal()  { actual = cola; }
+
+    public boolean hayAnterior() { 
+        
+        return actual != null && actual.anterior != null; }
+    public boolean haySiguiente(){ 
+        
+        return actual != null && actual.siguiente != null; }
+
+    // Buscar
+    public T buscar(Predicate<T> condicion) {//Devuelve el dato actual y avanza
+        Nodo<T> n = buscarNodo(condicion);
+        return (n != null) ? 
+                n.dato : null;
+    }
+    
+    private Nodo<T> buscarNodo(Predicate<T> condicion) {
+        Nodo<T> cur = cabeza;
+        while (cur != null) {
+            if (condicion.test(cur.dato)) return cur;
+            cur = cur.siguiente;
+        }
+        return null;
+    }
+
   } 
 
