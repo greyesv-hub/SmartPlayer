@@ -20,7 +20,7 @@ public class ListaCircular <T> implements Iterable <T> {
     private Nodo<T> actual; // puntero de reproducción
     private int tamano;
 
-    //  Insercion
+    //  Insercion 
 
     public void agregar(T dato) {
         Nodo<T> nuevo = new Nodo<>(dato);
