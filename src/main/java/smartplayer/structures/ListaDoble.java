@@ -4,6 +4,8 @@
  */
 package smartplayer.structures;
 
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 
 /**
@@ -113,6 +115,38 @@ public class ListaDoble<T> implements Iterable<T> {
         }
         return null;
     }
+    
+    //  Acceso 
+    public T getPrimero() { return (cabeza != null) ? cabeza.dato : null; }
+    public T getUltimo()  { return (cola   != null) ? cola.dato   : null; }
 
-  } 
+    public int getTamano()   { return tamano; }
+    public boolean isEmpty() { return tamano == 0; }
+
+    public void limpiar() { cabeza = cola = actual = null; tamano = 0; }
+
+    // Iterador
+    @Override
+    public Iterator<T> iterator() {
+        return new Iterator<T>() {
+            Nodo<T> cur = cabeza;
+            @Override public boolean hasNext() { return cur != null; }
+            @Override public T next() {
+                if (!hasNext()) throw new NoSuchElementException();
+                T d = cur.dato; cur = cur.siguiente; return d;
+            }
+        };
+    }
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[");
+        Nodo<T> cur = cabeza;
+        while (cur != null) {
+            sb.append(cur.dato);
+            if (cur.siguiente != null) sb.append(" <-> ");
+            cur = cur.siguiente;
+        }
+        return sb.append("]").toString();
+    }
+}
 
