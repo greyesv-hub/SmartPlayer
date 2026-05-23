@@ -1,8 +1,8 @@
 package smartplayer.model;
 
 /**
- * Clase que representa una Canción en el sistema Smart Player.
- * Contiene todos los metadatos necesarios para la gestión musical.
+ * Clase que representa una Cancion en el sistema Smart Player.
+ * Contiene todos los metadatos necesarios para la gestion musical.
  */
 public class Cancion implements Comparable<Cancion> {
 
@@ -55,7 +55,7 @@ public class Cancion implements Comparable<Cancion> {
     public void incrementarReproducciones() { this.vecesReproducida++; }
 
     /**
-     * Comparación por nombre (para inserción en ABB/AVL).
+     * Comparacion por nombre (para inserción en ABB/AVL).
      */
     @Override
     public int compareTo(Cancion otra) {
