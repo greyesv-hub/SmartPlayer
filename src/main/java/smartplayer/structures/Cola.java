@@ -40,4 +40,31 @@ public class Cola <T> {
         tamano--;
         return dato;
     }
+      // Devuelve el frente sin desencolarlo 
+    public T peek() {
+        if (isEmpty()) throw new NoSuchElementException("Cola vacía");
+        return frente.dato;
+    }
+
+    public boolean isEmpty() { return frente == null; }
+    public int getTamano()   { return tamano; }
+
+    public void limpiar() { frente = final_ = null; tamano = 0; }
+
+    // Muestra todos los elementos de la cola (frente → final) 
+    public String mostrarTodos() {
+        StringBuilder sb = new StringBuilder();
+        Nodo<T> cur = frente;
+        int i = 1;
+        while (cur != null) {
+            sb.append(i++).append(". ").append(cur.dato).append("\n");
+            cur = cur.siguiente;
+        }
+        return sb.toString();
+    }
+    @Override
+    public String toString() {
+        return "Cola(frente=" + (frente != null ? frente.dato : "null") +
+               ", tamaño=" + tamano + ")";
+    }
 }
