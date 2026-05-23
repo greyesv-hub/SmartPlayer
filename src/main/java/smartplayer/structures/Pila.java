@@ -5,9 +5,24 @@
 package smartplayer.structures;
 
 /**
- *
+ *Usada para el historial de reproduccion 
  * @author rmari
  */
-public class Pila {
-    
+public class Pila <T> {
+
+    private static class Nodo<T> {
+        T dato;
+        Nodo<T> siguiente;
+        Nodo(T dato) { this.dato = dato; }
+    }
+
+    private Nodo<T> tope;
+    private int tamano;
+
+    // Apila un elemento 
+    public void push(T dato) {
+        Nodo<T> nuevo = new Nodo<>(dato);
+        nuevo.siguiente = tope;
+        tope = nuevo; tamano++;
+    }
 }
