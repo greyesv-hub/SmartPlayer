@@ -47,4 +47,23 @@ public class Pila <T> {
 
     public void limpiar() { tope = null; tamano = 0; }
 
+    /**
+     * Muestra todos los elementos de la pila (tope a base),
+     * sin modificar la pila.
+     */
+    public String mostrarTodos() {
+        StringBuilder sb = new StringBuilder();
+        Nodo<T> cur = tope;
+        int i = 1;
+        while (cur != null) {
+            sb.append(i++).append(". ").append(cur.dato).append("\n");
+            cur = cur.siguiente;
+        }
+        return sb.toString();
+    }
+    @Override
+    public String toString() {
+        return "Pila(tope=" + (tope != null ? tope.dato : "null") +
+               ", tamaño=" + tamano + ")";
+    }
 }
