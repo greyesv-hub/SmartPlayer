@@ -8,7 +8,7 @@ package smartplayer.structures;
  *
  * @author rmari
  */
-  public class ListaDoble<T> implements Iterable<T> {
+public class ListaDoble<T> implements Iterable<T> {
 
     // Nodo interno 
     public static class Nodo<T> {
@@ -48,4 +48,32 @@ package smartplayer.structures;
         if (actual == null) actual = cabeza;
         tamano++;
     }
+    
+    // Eliminacion
+
+    public boolean eliminarPorValor(T dato) {
+        if (dato == null) return false;
+        Nodo<T> n = buscarNodo(d -> d.equals(dato));
+        if (n == null) return false;
+        eliminarNodo(n);
+        return true;
+    }
+
+    private void eliminarNodo(Nodo<T> n) {
+        if (n.anterior != null) n.anterior.siguiente = n.siguiente;
+        else cabeza = n.siguiente;
+        if (n.siguiente != null) n.siguiente.anterior = n.anterior;
+        else cola = n.anterior;
+        if (actual == n) actual = (n.siguiente != null) ? n.siguiente : n.anterior;
+        tamano--;
+    }
+    
+    // Regresa el dato actual y avanza al siguiente 
+    public T siguiente() {
+        if (actual == null) return null;
+        T dato = actual.dato;
+        actual = actual.siguiente;
+        return dato;
+    }
   } 
+
