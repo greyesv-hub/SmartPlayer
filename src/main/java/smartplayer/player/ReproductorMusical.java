@@ -17,23 +17,51 @@ import smartplayer.structures.Pila;
  */
 public class ReproductorMusical {
     
-    public enum ModoReproduccion { NORMAL, ALEATORIO, CIRCULAR }
+    public enum ModoReproduccion { NORMAL, ALEATORIO, CIRCULAR } //que es un enum? Un enum es un conjunto de valores constantes
 
     //  Estructuras de reproduccion
-    private final ListaDoble<Cancion>   listadoNavegacion = new ListaDoble<>();
-    private final ListaCircular<Cancion> listaCircular    = new ListaCircular<>();
-    private final Cola<Cancion>          colaReproduccion = new Cola<>();
-    private final Pila<Cancion>          historial        = new Pila<>();
+    private final ListaDoble<Cancion>   listadoNavegacion = new ListaDoble<>();  //funciona para avanzar y retroceder 
+    private final ListaCircular<Cancion> listaCircular    = new ListaCircular<>(); //Para la reproduccion infinita 
+    private final Cola<Cancion>          colaReproduccion = new Cola<>();// controla las canciones pendientes 
+    private final Pila<Cancion>          historial        = new Pila<>();//guarda las canciones reproducidas 
 
     //  Estado de reproduccion
-    private Cancion           cancionActual;
-    private ModoReproduccion  modo = ModoReproduccion.NORMAL;
-    private boolean           reproduciendo = false;
-    private boolean           pausado       = false;
+    private Cancion           cancionActual;//Guarda las canciones que estan sonando 
+    private ModoReproduccion  modo = ModoReproduccion.NORMAL; 
+    private boolean           reproduciendo = false;//Indica si la musia se esta reproduciendo 
+    private boolean           pausado       = false;//Esta pausada la musica 
 
     //  Reproductor JLayer 
-    private AdvancedPlayer player;
-    private Thread         hiloReproduccion;
-    private int            pauseFrame = 0;
+    private AdvancedPlayer player;//reproductor mp3
+    private Thread         hiloReproduccion;//porque usar hilo? porque reproducir la musica tarda y la interfaz se congelaria
+    private int            pauseFrame = 0;//guarada las posiciones donde se pauso la musica 
+    
+     // API publica = metodo accesible de otras clases  
 
+    // Agrega una cancion a la cola de reproduccion
+    public void encolar(Cancion c) { //agrega la cancion a la reproduccion 
+        colaReproduccion.enqueue(c);//mete la cancion a la cola
+        listadoNavegacion.agregarFinal(c);//la agrega a la navegacion 
+        listaCircular.agregar(c);
+    }
+
+    // Reproduce la cancion indicada 
+    public void reproducir(Cancion c) {//reproduce una cancion en especifico 
+        detener();//detiene la musica 
+        cancionActual = c;//guarda 
+        c.incrementarReproducciones();//aumenta el contador de reproduccion 
+        historial.push(c);//guarda la cancion en el historial 
+        iniciarReproduccion(c);
+    }
+
+    // Pausa la reproduccion actual 
+    public void pausar() {
+        if (reproduciendo && !pausado) {
+            if (player != null) player.close();//detiene al reproducion //player.close() realmente detiene el audio; Los booleanos solo representan el estado interno
+            pausado = true;
+            reproduciendo = false;
+        }
+    }
+    
+    
 }
