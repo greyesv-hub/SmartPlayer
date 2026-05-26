@@ -4,6 +4,7 @@
  */
 package smartplayer.player;
 
+import java.io.FileInputStream;
 import javazoom.jl.player.advanced.AdvancedPlayer;
 import smartplayer.model.Cancion;
 import smartplayer.structures.Cola;
@@ -99,6 +100,43 @@ public class ReproductorMusical {
         reproduciendo = false;
         pausado = false;
     }
+    
+   //  Reproduccion interna
+    private void iniciarReproduccion(Cancion c) {
+        hiloReproduccion = new Thread(() -> {// se reproducira mientras la interfaz siga funcionando 
+            try (FileInputStream fis = new FileInputStream(c.getRuta())) {//abre los archivos mp3 y devuelve su ruta 
+                player = new AdvancedPlayer(fis);//al usar try evita fugas de memoria //AdvancedPlayer: clase de libreria JLayer 
+                reproduciendo = true;
+                player.play();//funciona el sonido 
+                // Cuando termina, reproduce la siguiente automaticamente
+                if (!pausado) onCancionTerminada();//player.play = es bloqueante; el hilo queda ocupado hasta que termine la cancion
+            } catch (Exception e) {
+                System.err.println("Error reproduciendo: " + e.getMessage());
+            }
+        });
+        hiloReproduccion.setDaemon(true);//Daemon hilo secundario, evita procesos fantasmas 
+        hiloReproduccion.start();
+    }
 
+    private void onCancionTerminada() {
+        Cancion sig = obtenerSiguiente();
+        if (sig != null) reproducir(sig);
+    }
+
+    private Cancion obtenerSiguiente() {
+        switch (modo) {
+            case CIRCULAR:
+                return listaCircular.siguiente();
+            case ALEATORIO:
+                // TODO: implementar con arreglo y shuffle//codigo pendiente 
+                return colaReproduccion.isEmpty() ? null : colaReproduccion.dequeue();//dequeue saca el primer elemento 
+            default: // NORMAL
+                if (!colaReproduccion.isEmpty()) return colaReproduccion.dequeue();
+                return listadoNavegacion.getActual() != null
+                       ? listadoNavegacion.siguiente()
+                       : null;
+        }
+    }
+    
     
 }
