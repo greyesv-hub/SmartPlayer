@@ -124,19 +124,65 @@ public class ReproductorMusical {
     }
 
     private Cancion obtenerSiguiente() {
-        switch (modo) {
-            case CIRCULAR:
-                return listaCircular.siguiente();
-            case ALEATORIO:
-                // TODO: implementar con arreglo y shuffle//codigo pendiente 
-                return colaReproduccion.isEmpty() ? null : colaReproduccion.dequeue();//dequeue saca el primer elemento 
-            default: // NORMAL
-                if (!colaReproduccion.isEmpty()) return colaReproduccion.dequeue();
-                return listadoNavegacion.getActual() != null
-                       ? listadoNavegacion.siguiente()
-                       : null;
+       
+    switch (modo) {
+        case CIRCULAR:
+            return listaCircular.siguiente();
+
+        case ALEATORIO:
+            if (colaReproduccion.isEmpty()) {
+                return null;
+            }
+            return colaReproduccion.dequeue();
+
+        default: // NORMAL
+            
+            if (!colaReproduccion.isEmpty()) {
+                return colaReproduccion.dequeue();
+            }
+            if (listadoNavegacion.getActual() != null) {
+                return listadoNavegacion.siguiente();
+            }
+            return null;
         }
     }
     
-    
+     //  Modo de reproduccion 
+    public void setModo(ModoReproduccion modo){ 
+        this.modo = modo; 
+    }//Cambia el modo de reproduccion actual
+    public ModoReproduccion getModo(){ 
+        return modo; 
+    }
+
+    //  Getters de estado//Porque las variables son privadas
+    public Cancion        getCancionActual(){ 
+        return cancionActual; }
+    public boolean        isReproduciendo(){ //tipo boolean
+        return reproduciendo; }
+    public boolean        isPausado(){ 
+        return pausado; }
+    public Cola<Cancion>  getColaReproduccion(){ 
+        return colaReproduccion; }
+    public Pila<Cancion>  getHistorial(){ 
+        return historial; }
+
+    // Resumen del historial de reproduccion 
+    public String getHistorialString() {
+        
+         if (historial.isEmpty()) {
+        return "Historial vacio";
+    } else {
+        return historial.mostrarTodos();
+       }
+    }
+
+    // Resumen de la cola de reproduccion 
+    public String getColaString() {
+         if (colaReproduccion.isEmpty()) {
+        return "Cola vacia";
+    } else {
+        return colaReproduccion.mostrarTodos();
+      }
+    }
 }
