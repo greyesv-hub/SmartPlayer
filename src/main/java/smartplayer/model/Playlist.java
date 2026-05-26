@@ -4,10 +4,64 @@
  */
 package smartplayer.model;
 
+import java.util.UUID;
+import smartplayer.structures.ListaDoble;
+
 /**
  *
  * @author rmari
  */
 public class Playlist {
-    
+    private String id;
+    private String nombre;
+    private ListaDoble<Cancion> canciones;
+    private boolean encriptada;
+
+    public Playlist(String nombre) {
+        this.id       = UUID.randomUUID().toString();
+        this.nombre   = nombre;
+        this.canciones = new ListaDoble<>();
+        this.encriptada = false;
+    }
+
+    //  Gestion de canciones 
+    public void agregarCancion(Cancion c)   { canciones.agregarFinal(c); }
+
+    public boolean eliminarCancion(String nombreCancion) {
+        return canciones.eliminarPorValor(
+                canciones.buscar(c -> c.getNombre().equalsIgnoreCase(nombreCancion)));
+    }
+
+    public ListaDoble<Cancion> getCanciones() { return canciones; }
+
+    // Numero de canciones en la playlist
+    public int getTotalCanciones() { return canciones.getTamano(); }
+
+    /** Duración total en segundos */
+    public double getDuracionTotal() {
+        double total = 0;
+        for (Cancion c : canciones) total += c.getDuracion();
+        return total;
+    }
+
+    public String getDuracionTotalFormateada() {
+        double seg = getDuracionTotal();
+        int h   = (int)(seg / 3600);
+        int min = (int)((seg % 3600) / 60);
+        int s   = (int)(seg % 60);
+        return String.format("%02d:%02d:%02d", h, min, s);
+    }
+
+    // ── Getters / Setters ──────────────────────────────────────────────────
+    public String getId()       { return id; }
+    public String getNombre()   { return nombre; }
+    public void   setNombre(String n) { this.nombre = n; }
+    public boolean isEncriptada()     { return encriptada; }
+    public void   setEncriptada(boolean e) { this.encriptada = e; }
+
+    @Override
+    public String toString() {
+        return String.format("Playlist '%s' | %d canciones | %s",
+                nombre, getTotalCanciones(), getDuracionTotalFormateada());
+    }   
 }
