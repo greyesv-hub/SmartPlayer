@@ -17,14 +17,14 @@ public class BibliotecaMusical {
     // Estructuras de indexación
     private final ListaSimple<Cancion> listaBiblioteca = new ListaSimple<>();
 
-    // Estadísticas de carga
+    // Estadisticas de carga
     private int  totalCargadas;
 
     // ── Carga de archivos ──────────────────────────────────────────────────
 
     /**
-     * Carga recursivamente todos los archivos de audio desde una carpeta.
-     * @param ruta ruta de la carpeta raíz
+     * Carga recursivamente todos los archivos de audio desde una carpeta
+     * @param ruta ruta de la carpeta raiz
      * @return lista de canciones encontradas
      */
     public List<Cancion> cargarDesde(String ruta) {
@@ -44,7 +44,7 @@ public class BibliotecaMusical {
         return canciones;
     }
 
-    /** Busca archivos de audio recursivamente */
+    // Busca archivos de audio recursivamente 
     private void buscarArchivosRec(File dir, List<File> resultado) {
         if (!dir.exists() || !dir.isDirectory()) return;
         File[] hijos = dir.listFiles();
@@ -65,8 +65,8 @@ public class BibliotecaMusical {
     }
 
     /**
-     * Parsea un archivo de audio y extrae metadatos básicos.
-     * Para metadatos reales se usaría JAudioTagger; aquí usamos el nombre de archivo.
+     * Parsea un archivo de audio y extrae metadatos basicos
+     * Para metadatos reales se usaria JAudioTagger; aqui se usa el nombre de archivo.
      */
     private Cancion parsearArchivo(File f) {
         try {
@@ -96,18 +96,18 @@ public class BibliotecaMusical {
 
     private String extraerAlbumDeCarpeta(File f) {
         File padre = f.getParentFile();
-        return (padre != null) ? padre.getName() : "Álbum Desconocido";
+        return (padre != null) ? padre.getName() : "Album Desconocido";
     }
 
-    /** Estimación simple: ~1 MB ≈ 60 segundos de audio MP3 */
+    // Estimacion simple: ~1 MB ≈ 60 segundos de audio MP3 
     private double estimarDuracion(long bytes) {
         return (bytes / (1024.0 * 1024.0)) * 60.0;
     }
 
-    // ── Detección de duplicados ────────────────────────────────────────────
+    //  Deteccion de duplicados 
 
     /**
-     * Detecta archivos duplicados por tamaño y nombre.
+     * Detecta archivos duplicados por tamaño y nombre
      * @return lista de pares (cancion1, cancion2) duplicados
      */
     public List<Cancion[]> detectarDuplicados() {
@@ -134,7 +134,7 @@ public class BibliotecaMusical {
         return r;
     }
 
-    // ── Getters ────────────────────────────────────────────────────────────
+    //  Getters 
 
     public ListaSimple<Cancion> getListaBiblioteca()    { return listaBiblioteca; }
 }
