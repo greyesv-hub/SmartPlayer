@@ -17,24 +17,24 @@ public class GestorPlaylist {
      private final ListaSimple<Playlist> playlists = new ListaSimple<>();
 
     // CRUD 
-    public Playlist crearPlaylist(String nombre) {
+    public Playlist crearPlaylist(String nombre) {//Crea una nueva playlist y la guarda
         Playlist p = new Playlist(nombre);
         playlists.agregarFinal(p);
-        return p;
+        return p;//regresa la playlist ya creada  
     }
 
     public boolean eliminarPlaylist(String nombre) {
         Playlist p = buscarPlaylist(nombre);
-        if (p == null) 
+        if (p == null) //por que null? devuelve null si no encuentra nada
          return false;
-        return playlists.eliminar(p);
+        return playlists.eliminar(p);//Elimina el objeto de la lista
     }
 
     public boolean agregarCancion(String nombrePlaylist, Cancion c) {
         Playlist p = buscarPlaylist(nombrePlaylist);
         if (p == null) 
             return false;
-        p.agregarCancion(c);
+        p.agregarCancion(c);//La playlist agrega la cancion internamente
         return true;
     }
     
