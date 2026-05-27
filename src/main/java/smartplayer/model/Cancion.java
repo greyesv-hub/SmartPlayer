@@ -30,7 +30,6 @@ public class Cancion implements Comparable<Cancion> {
         this.vecesReproducida = 0;
     }
 
-    // ── Getters ────────────────────────────────────────────────────────────
     public String getNombre()          { return nombre; }
     public String getArtista()         { return artista; }
     public String getAlbum()           { return album; }
@@ -41,7 +40,6 @@ public class Cancion implements Comparable<Cancion> {
     public int    getAnio()            { return anio; }
     public int    getVecesReproducida(){ return vecesReproducida; }
 
-    // ── Setters ────────────────────────────────────────────────────────────
     public void setNombre(String nombre)    { this.nombre = nombre; }
     public void setArtista(String artista)  { this.artista = artista; }
     public void setAlbum(String album)      { this.album = album; }
@@ -51,7 +49,7 @@ public class Cancion implements Comparable<Cancion> {
     public void setRuta(String ruta)        { this.ruta = ruta; }
     public void setAnio(int anio)           { this.anio = anio; }
 
-    /** Incrementa el contador de reproducciones */
+    // Incrementa el contador de reproducciones 
     public void incrementarReproducciones() { this.vecesReproducida++; }
 
     /**
@@ -62,14 +60,14 @@ public class Cancion implements Comparable<Cancion> {
         return this.nombre.compareToIgnoreCase(otra.nombre);
     }
 
-    /** Duración formateada mm:ss */
+    // Duracion formateada mm:ss 
     public String getDuracionFormateada() {
         int min = (int)(duracion / 60);
         int seg = (int)(duracion % 60);
         return String.format("%02d:%02d", min, seg);
     }
 
-    /** Tamaño en MB con 2 decimales */
+    // Tamaño en MB con 2 decimales 
     public String getTamanoFormateado() {
         double mb = tamano / (1024.0 * 1024.0);
         return String.format("%.2f MB", mb);
