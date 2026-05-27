@@ -25,22 +25,38 @@ public class Playlist {
     }
 
     //  Gestion de canciones 
-    public void agregarCancion(Cancion c)   { canciones.agregarFinal(c); }
+    public void agregarCancion(Cancion c){ 
+        canciones.agregarFinal(c); }
 
     public boolean eliminarCancion(String nombreCancion) {
-        return canciones.eliminarPorValor(
-                canciones.buscar(c -> c.getNombre().equalsIgnoreCase(nombreCancion)));
+        Cancion encontrada = null;
+
+        for (Cancion c : canciones) {
+            if (c.getNombre().equalsIgnoreCase(nombreCancion)) {
+                encontrada = c;
+                break;
+            }
+        }
+        if (encontrada == null) {
+            return false;
+        }
+        return canciones.eliminarPorValor(encontrada);
     }
 
-    public ListaDoble<Cancion> getCanciones() { return canciones; }
+    public ListaDoble<Cancion> getCanciones() { 
+        return canciones; }
 
     // Numero de canciones en la playlist
-    public int getTotalCanciones() { return canciones.getTamano(); }
+    public int getTotalCanciones() { 
+        return canciones.getTamano(); }
 
-    // Duracion total en segundos 
+    // Duracion total en seg
     public double getDuracionTotal() {
+        
         double total = 0;
-        for (Cancion c : canciones) total += c.getDuracion();
+        for (Cancion c : canciones) {
+            total += c.getDuracion();
+        }
         return total;
     }
 
@@ -60,7 +76,9 @@ public class Playlist {
 
     @Override
     public String toString() {
-        return String.format("Playlist '%s' | %d canciones | %s",
-                nombre, getTotalCanciones(), getDuracionTotalFormateada());
-    }   
+       
+        return "Playlist: " + nombre
+                + " | Canciones: " + getTotalCanciones()
+                + " | Duración: " + getDuracionTotalFormateada();
+    }
 }
