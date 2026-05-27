@@ -1,6 +1,8 @@
 package smartplayer.structures;
 
+import java.util.ArrayList;
 import java.util.Iterator;//funciona para que rrecorra la lista 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.Predicate;//funciona para usar condiciones de busqueda 
 
@@ -84,9 +86,31 @@ public class ListaSimple<T> implements Iterable<T> {//<T> es una clase generica 
         }
         return false;
     }
+     public ListaSimple<T> buscarTodos(Predicate<T> condicion) {
 
+        ListaSimple<T> resultados = new ListaSimple<>();
+
+        Nodo<T> actual = cabeza;
+
+        while (actual != null) {
+            if (condicion.test(actual.dato)) {
+                resultados.agregarFinal(actual.dato);
+            }
+            actual = actual.siguiente;
+        }
+        return resultados;
+    }
+
+    public List<T> toList() {
+
+        List<T> lista = new ArrayList<>();
+        for (T elemento : this) {
+            lista.add(elemento);
+        }
+        return lista;
+    }
+    
     //  Acceso 
-
     public T getPrimero() {
         if (cabeza == null) return null;
         return cabeza.dato;
