@@ -37,7 +37,7 @@ public class Playlist {
     // Numero de canciones en la playlist
     public int getTotalCanciones() { return canciones.getTamano(); }
 
-    /** Duración total en segundos */
+    // Duracion total en segundos 
     public double getDuracionTotal() {
         double total = 0;
         for (Cancion c : canciones) total += c.getDuracion();
@@ -52,7 +52,6 @@ public class Playlist {
         return String.format("%02d:%02d:%02d", h, min, s);
     }
 
-    // ── Getters / Setters ──────────────────────────────────────────────────
     public String getId()       { return id; }
     public String getNombre()   { return nombre; }
     public void   setNombre(String n) { this.nombre = n; }
