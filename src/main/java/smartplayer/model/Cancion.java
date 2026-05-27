@@ -4,7 +4,7 @@ package smartplayer.model;
  * Clase que representa una Cancion en el sistema Smart Player.
  * Contiene todos los metadatos necesarios para la gestion musical.
  */
-public class Cancion implements Comparable<Cancion> {
+public class Cancion implements Comparable<Cancion> {//comparar canciones entre si
 
     private String nombre;
     private String artista;
@@ -17,7 +17,7 @@ public class Cancion implements Comparable<Cancion> {
     private int vecesReproducida;
 
     public Cancion(String nombre, String artista, String album,
-                   String genero, double duracion, long tamano,
+                   String genero, double duracion, long tamano, 
                    String ruta, int anio) {
         this.nombre = nombre;
         this.artista = artista;
@@ -50,11 +50,10 @@ public class Cancion implements Comparable<Cancion> {
     public void setAnio(int anio)           { this.anio = anio; }
 
     // Incrementa el contador de reproducciones 
-    public void incrementarReproducciones() { this.vecesReproducida++; }
+    public void incrementarReproducciones() { 
+        this.vecesReproducida++; }
 
-    /**
-     * Comparacion por nombre (para inserción en ABB/AVL).
-     */
+    //Comparacion por nombre (para insercion en ABB/AVL)
     @Override
     public int compareTo(Cancion otra) {
         return this.nombre.compareToIgnoreCase(otra.nombre);
@@ -63,14 +62,14 @@ public class Cancion implements Comparable<Cancion> {
     // Duracion formateada mm:ss 
     public String getDuracionFormateada() {
         int min = (int)(duracion / 60);
-        int seg = (int)(duracion % 60);
+        int seg = (int)(duracion % 60);//Obtiene residuo
         return String.format("%02d:%02d", min, seg);
     }
 
     // Tamaño en MB con 2 decimales 
     public String getTamanoFormateado() {
         double mb = tamano / (1024.0 * 1024.0);
-        return String.format("%.2f MB", mb);
+        return String.format("%.2f MB", mb);//%.2f: Mostrar 2 decimales
     }
 
     @Override
