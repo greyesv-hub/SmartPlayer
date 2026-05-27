@@ -18,10 +18,10 @@ public class Playlist {
     private boolean encriptada;
 
     public Playlist(String nombre) {
-        this.id       = UUID.randomUUID().toString();
+        this.id       = UUID.randomUUID().toString();//UUID: Genera un identificador Unico automaticamente, randomUUID(): id aleatorio, toString: Convierte UUID a texto  
         this.nombre   = nombre;
         this.canciones = new ListaDoble<>();
-        this.encriptada = false;
+        this.encriptada = false;//La playlist inicia NO encriptada
     }
 
     //  Gestion de canciones 
@@ -54,7 +54,7 @@ public class Playlist {
     public double getDuracionTotal() {
         
         double total = 0;
-        for (Cancion c : canciones) {
+        for (Cancion c : canciones) {//Recorre todas las canciones
             total += c.getDuracion();
         }
         return total;
@@ -79,6 +79,6 @@ public class Playlist {
        
         return "Playlist: " + nombre
                 + " | Canciones: " + getTotalCanciones()
-                + " | Duración: " + getDuracionTotalFormateada();
+                + " | Duracion: " + getDuracionTotalFormateada();
     }
 }
