@@ -12,115 +12,158 @@ import java.util.List;
  */
 public class BibliotecaMusical {
 
-    private static final String[] EXTENSIONES = {".mp3", ".wav", ".flac", ".ogg", ".aac"};
+    private static final String[] EXTENSIONES = {
+            ".mp3",
+            ".wav",
+            ".flac",
+            ".ogg",
+            ".aac"
+    };
 
-    // Estructuras de indexación
-    private final ListaSimple<Cancion> listaBiblioteca = new ListaSimple<>();
+    private ListaSimple<Cancion> listaBiblioteca;
 
-    // Estadisticas de carga
-    private int  totalCargadas;
+    private int totalCargadas;
 
-    // ── Carga de archivos ──────────────────────────────────────────────────
+    public BibliotecaMusical() {
 
-    /**
-     * Carga recursivamente todos los archivos de audio desde una carpeta
-     * @param ruta ruta de la carpeta raiz
-     * @return lista de canciones encontradas
-     */
+        listaBiblioteca = new ListaSimple<>();
+        totalCargadas = 0;
+    }
+
     public List<Cancion> cargarDesde(String ruta) {
+
         List<File> archivos = new ArrayList<>();
+
         buscarArchivosRec(new File(ruta), archivos);
 
         List<Cancion> canciones = new ArrayList<>();
-        for (File f : archivos) {
-            Cancion c = parsearArchivo(f);
-            if (c != null) canciones.add(c);
-        }
 
-        // Lista simple (biblioteca general)
-        for (Cancion c : canciones) listaBiblioteca.agregarFinal(c);
+        for (File archivo : archivos) {
+            Cancion nueva = parsearArchivo(archivo);
+
+            if (nueva != null) {
+                canciones.add(nueva);
+                listaBiblioteca.agregarFinal(nueva);
+            }
+        }
 
         totalCargadas = canciones.size();
         return canciones;
     }
 
-    // Busca archivos de audio recursivamente 
-    private void buscarArchivosRec(File dir, List<File> resultado) {
-        if (!dir.exists() || !dir.isDirectory()) return;
-        File[] hijos = dir.listFiles();
-        if (hijos == null) return;
-        for (File f : hijos) {
-            if (f.isDirectory()) {
-                buscarArchivosRec(f, resultado);
-            } else if (esAudio(f)) {
-                resultado.add(f);
+    private void buscarArchivosRec(File carpeta, List<File> resultado) {
+
+        if (!carpeta.exists()) {
+            return;
+        }
+
+        if (!carpeta.isDirectory()) {
+            return;
+        }
+
+        File[] archivos = carpeta.listFiles();
+        if (archivos == null) {
+            return;
+        }
+
+        for (File archivo : archivos) {
+            if (archivo.isDirectory()) {
+                buscarArchivosRec(archivo, resultado);
+            } else {
+                if (esAudio(archivo)) {
+                    resultado.add(archivo);
+                }
             }
         }
     }
 
-    private boolean esAudio(File f) {
-        String nombre = f.getName().toLowerCase();
-        for (String ext : EXTENSIONES) if (nombre.endsWith(ext)) return true;
+    private boolean esAudio(File archivo) {
+
+        String nombre = archivo.getName().toLowerCase();
+        for (String extension : EXTENSIONES) {
+            if (nombre.endsWith(extension)) {
+                return true;
+            }
+        }
         return false;
     }
 
-    /**
-     * Parsea un archivo de audio y extrae metadatos basicos
-     * Para metadatos reales se usaria JAudioTagger; aqui se usa el nombre de archivo.
-     */
-    private Cancion parsearArchivo(File f) {
+    private Cancion parsearArchivo(File archivo) {
+
         try {
-            String nombre   = quitarExtension(f.getName());
-            String artista  = extraerArtistaDeCarpeta(f);
-            String album    = extraerAlbumDeCarpeta(f);
-            long   tamano   = f.length();
-            double duracion = estimarDuracion(tamano); // estimación simple
-            return new Cancion(nombre, artista, album, "Desconocido",
-                               duracion, tamano, f.getAbsolutePath(), 2024);
+            String nombre = quitarExtension(archivo.getName());
+            String artista = extraerArtistaDeCarpeta(archivo);
+            String album = extraerAlbumDeCarpeta(archivo);
+            long tamano = archivo.length();
+            double duracion = estimarDuracion(tamano);
+
+            Cancion nueva = new Cancion(
+                    nombre,
+                    artista,
+                    album,
+                    "Desconocido",
+                    duracion,
+                    tamano,
+                    archivo.getAbsolutePath(),
+                    2024
+            );
+            return nueva;
         } catch (Exception e) {
             return null;
         }
     }
 
     private String quitarExtension(String nombre) {
-        int idx = nombre.lastIndexOf('.');
-        return (idx > 0) ? nombre.substring(0, idx) : nombre;
+
+        int posicion = nombre.lastIndexOf('.');
+        if (posicion > 0) {
+            return nombre.substring(0, posicion);
+        }
+        return nombre;
     }
 
-    private String extraerArtistaDeCarpeta(File f) {
-        File padre = f.getParentFile();
-        if (padre == null) return "Artista Desconocido";
-        File abuelo = padre.getParentFile();
-        return (abuelo != null) ? abuelo.getName() : padre.getName();
+    private String extraerArtistaDeCarpeta(File archivo) {
+
+        File carpeta = archivo.getParentFile();
+        if (carpeta == null) {
+            return "Artista Desconocido";
+        }
+
+        File carpetaSuperior = carpeta.getParentFile();
+        if (carpetaSuperior != null) {
+            return carpetaSuperior.getName();
+        }
+        return carpeta.getName();
     }
 
-    private String extraerAlbumDeCarpeta(File f) {
-        File padre = f.getParentFile();
-        return (padre != null) ? padre.getName() : "Album Desconocido";
-    }
+    private String extraerAlbumDeCarpeta(File archivo) {
 
-    // Estimacion simple: ~1 MB ≈ 60 segundos de audio MP3 
+        File carpeta = archivo.getParentFile();
+        if (carpeta != null) {
+            return carpeta.getName();
+        }
+        return "Album Desconocido";
+    }
+    
     private double estimarDuracion(long bytes) {
-        return (bytes / (1024.0 * 1024.0)) * 60.0;
+        double mb = bytes / (1024.0 * 1024.0);
+        return mb * 60;
     }
 
-    //  Deteccion de duplicados 
-
-    /**
-     * Detecta archivos duplicados por tamaño y nombre
-     * @return lista de pares (cancion1, cancion2) duplicados
-     */
     public List<Cancion[]> detectarDuplicados() {
-        List<Cancion> todas = listaBiblioteca.isEmpty()
-                ? new ArrayList<>()
-                : toList(listaBiblioteca);
+
+        List<Cancion> todas = toList(listaBiblioteca);
+
         List<Cancion[]> duplicados = new ArrayList<>();
+
         for (int i = 0; i < todas.size(); i++) {
             for (int j = i + 1; j < todas.size(); j++) {
                 Cancion a = todas.get(i);
                 Cancion b = todas.get(j);
-                if (a.getTamano() == b.getTamano()
-                        && a.getNombre().equalsIgnoreCase(b.getNombre())) {
+                boolean mismoTamano =
+                        a.getTamano() == b.getTamano();
+                boolean mismoNombre = a.getNombre().equalsIgnoreCase(b.getNombre());
+                if (mismoTamano && mismoNombre) {
                     duplicados.add(new Cancion[]{a, b});
                 }
             }
@@ -128,13 +171,24 @@ public class BibliotecaMusical {
         return duplicados;
     }
 
-    private List<Cancion> toList(ListaSimple<Cancion> ls) {
-        List<Cancion> r = new ArrayList<>();
-        for (Cancion c : ls) r.add(c);
-        return r;
+    private List<Cancion> toList(ListaSimple<Cancion> lista) {
+
+        List<Cancion> nueva = new ArrayList<>();
+        for (Cancion c : lista) {
+            nueva.add(c);
+        }
+        return nueva;
     }
 
-    //  Getters 
+    public ListaSimple<Cancion> getListaBiblioteca() {
+        return listaBiblioteca;
+    }
 
-    public ListaSimple<Cancion> getListaBiblioteca()    { return listaBiblioteca; }
+    public int getTotalCargadas() {
+        return totalCargadas;
+    }
+
+    public String getResumenComparativaCarga() {
+        return "Canciones cargadas: " + totalCargadas;
+    }
 }
