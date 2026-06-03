@@ -105,5 +105,55 @@ public class ArbolAVL {
 
         return nodo; 
     }
+      public void insertar(Cancion cancion) {
+      raiz = insertarNodo(raiz, cancion);
+    }
+
+      private Nodo insertarNodo(Nodo nodo, Cancion cancion) { 
+      if (nodo == null) {
+        totalNodos++;
+        return new Nodo(cancion);
+    }
+      int resultado = cancion.compareTo(nodo.cancion);
+      if (resultado < 0) {
+        nodo.izquierdo = insertarNodo(nodo.izquierdo, cancion);
+    } else if (resultado > 0) {
+        nodo.derecho = insertarNodo(nodo.derecho, cancion);
+    } else {
+        return nodo; // la canción ya existe
+    }
+
+        return balancear(nodo);
+    }
+
+    // Buscar una cancion por nombre
+
+    public Cancion buscar(String nombre) {
+
+    Nodo encontrado = buscarNodo(raiz, nombre); 
+    if (encontrado != null) {
+        return encontrado.cancion;
+    }
+    return null;
+    }
+
+    private Nodo buscarNodo(Nodo nodo, String nombre) {
+    if (nodo == null) {
+        return null;
+    }
+
+    int resultado = nombre.compareToIgnoreCase(
+            nodo.cancion.getNombre());
+
+    if (resultado < 0) {
+        return buscarNodo(nodo.izquierdo, nombre);
+    }
+
+    if (resultado > 0) {
+        return buscarNodo(nodo.derecho, nombre);
+    }
+
+    return nodo;
+  }
       
 }
