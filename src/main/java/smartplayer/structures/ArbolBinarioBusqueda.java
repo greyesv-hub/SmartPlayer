@@ -161,27 +161,62 @@ public class ArbolBinarioBusqueda {
     return cancionesEliminadas[0] > 0;
     }
 
-    private Nodo eliminarRec(Nodo nodo, String nombre, int[] cont) {
-        if (nodo == null) return null;
-        int cmp = nombre.compareToIgnoreCase(nodo.cancion.getNombre());
-        if (cmp < 0) nodo.izquierdo = eliminarRec(nodo.izquierdo, nombre, cont);
-        else if (cmp > 0) nodo.derecho = eliminarRec(nodo.derecho, nombre, cont);
-        else {
-            cont[0]++;
-            totalNodos--;
-            if (nodo.izquierdo == null) return nodo.derecho;
-            if (nodo.derecho   == null) return nodo.izquierdo;
-            // Sucesor inorden (mínimo del subárbol derecho)
-            Nodo sucesor = minimo(nodo.derecho);
-            nodo.cancion = sucesor.cancion;
-            nodo.derecho = eliminarRec(nodo.derecho, sucesor.cancion.getNombre(), new int[]{0});
-        }
-        return nodo;
+    private Nodo eliminarNodo(Nodo nodo, String nombre, int[] cancionesEliminadas) {
+
+    if (nodo == null) {
+        return null;
     }
 
-    private Nodo minimo(Nodo n) {
-        while (n.izquierdo != null) n = n.izquierdo;
-        return n;
+    int resultado = nombre.compareToIgnoreCase(nodo.cancion.getNombre());
+
+    // Buscar en el sub-arbol izquierdo
+    if (resultado < 0) {
+
+        nodo.izquierdo = eliminarNodo(
+                nodo.izquierdo,
+                nombre,
+                cancionesEliminadas
+        );
+    }
+
+    // Buscar en el sub-arbol derecho
+    else if (resultado > 0) {
+
+        nodo.derecho = eliminarNodo(
+                nodo.derecho,
+                nombre,
+                cancionesEliminadas
+        );
+    }else {
+        cancionesEliminadas[0]++; totalNodos--;
+
+        // Solo tiene hijo derecho
+        if (nodo.izquierdo == null) {
+            return nodo.derecho;
+        }
+
+        // Solo tiene hijo izquierdo
+        if (nodo.derecho == null) {
+            return nodo.izquierdo;
+        }
+
+        // Tiene dos hijos
+        Nodo reemplazo = obtenerMenor(nodo.derecho);
+
+        nodo.cancion = reemplazo.cancion;
+        nodo.derecho = eliminarNodo(nodo.derecho, reemplazo.cancion.getNombre(), new int[]{0}
+        );
+         }
+        return nodo;
+        }
+
+     private Nodo obtenerMenor(Nodo nodo) {
+
+     while (nodo.izquierdo != null) {
+        nodo = nodo.izquierdo;
+    }
+
+    return nodo;
     }
 
     public List<Cancion> inOrden() {
@@ -223,15 +258,37 @@ public class ArbolBinarioBusqueda {
         lista.add(n.cancion);
     }
 
-    public int getTotalNodos() { return totalNodos; }
-    public boolean isEmpty()   { return raiz == null; }
-    public Nodo getRaiz()      { return raiz; }
-
-    public int altura() { return alturaRec(raiz); }
-
-    private int alturaRec(Nodo n) {
-        if (n == null) return 0;
-        return 1 + Math.max(alturaRec(n.izquierdo), alturaRec(n.derecho));
+    // Métodos de apoyo
+    public int getTotalNodos() {
+    return totalNodos;
     }
+
+    public boolean estaVacio() {
+    return raiz == null;
+    }
+
+    public Nodo getRaiz() {
+    return raiz;
+    }
+
+    public int getAltura() {
+    return calcularAltura(raiz);
+    }
+
+    private int calcularAltura(Nodo nodo) {
+
+    if (nodo == null) {
+        return 0;
+    }
+
+    int alturaIzquierda = calcularAltura(nodo.izquierdo);
+    int alturaDerecha = calcularAltura(nodo.derecho);
+
+    if (alturaIzquierda > alturaDerecha) {
+        return alturaIzquierda + 1;
+    } else {
+        return alturaDerecha + 1;
+     }
+   } 
 }
 
