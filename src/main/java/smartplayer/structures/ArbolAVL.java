@@ -13,8 +13,7 @@ import smartplayer.model.Cancion;
  * @author rmari
  */
 public class ArbolAVL {
-    
-      // Nodo interno 
+
     public static class Nodo {
         public Cancion cancion;
         public Nodo izquierdo;
@@ -207,8 +206,88 @@ public class ArbolAVL {
 
     List<Cancion> cancionesEncontradas = new ArrayList<>();
 
-    buscarGeneroRec(raiz, genero.toLowerCase(), cancionesEncontradas);
+    buscarGenero(raiz, genero.toLowerCase(), cancionesEncontradas);
 
     return cancionesEncontradas;
+    }
+    
+    private void buscarGenero(Nodo nodo, String genero, List<Cancion> cancionesEncontradas) {
+
+    if (nodo == null) {
+        return;
+    }
+
+    if (nodo.cancion.getGenero().toLowerCase().contains(genero)) {
+        cancionesEncontradas.add(nodo.cancion);
+    }
+
+    buscarGenero(nodo.izquierdo, genero, cancionesEncontradas);
+    buscarGenero(nodo.derecho, genero, cancionesEncontradas);
+    }
+
+    public boolean modificar(String nombre, Cancion nuevaCancion) {
+
+    Nodo encontrado = buscarNodo(raiz, nombre);
+
+    if (encontrado == null) {
+        return false;
+    }
+
+    encontrado.cancion = nuevaCancion;
+    return true;
+    }
+
+    public boolean eliminar(String nombre) {
+
+    int cantidadAntes = totalNodos;
+    raiz = eliminarNodo(raiz, nombre);
+
+    return totalNodos < cantidadAntes;
+    }
+
+    private Nodo eliminarNodo(Nodo nodo, String nombre) {
+
+    if (nodo == null) {
+        return null;
+    }
+
+    int resultado = nombre.compareToIgnoreCase(nodo.cancion.getNombre());
+
+    if (resultado < 0) {
+        nodo.izquierdo = eliminarNodo(nodo.izquierdo, nombre);
+    } else if (resultado > 0) {
+        nodo.derecho = eliminarNodo(nodo.derecho, nombre);
+    } else {
+        totalNodos--;
+
+        // Solo tiene hijo derecho
+        if (nodo.izquierdo == null) {
+            return nodo.derecho;
+        }
+
+        // Solo tiene hijo izquierdo
+        if (nodo.derecho == null) {
+            return nodo.izquierdo;
+        }
+
+        // Tiene dos hijos
+        Nodo reemplazo = obtenerMenor(nodo.derecho);
+        nodo.cancion = reemplazo.cancion;
+        nodo.derecho = eliminarNodo(
+                nodo.derecho,
+                reemplazo.cancion.getNombre()
+        );
+    }
+
+    return balancear(nodo);
+    }
+
+    private Nodo obtenerMenor(Nodo nodo) {
+
+    while (nodo.izquierdo != null) {
+        nodo = nodo.izquierdo;
+    }
+
+    return nodo;
     }
 }
