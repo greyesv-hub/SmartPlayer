@@ -50,5 +50,32 @@ public class ArbolAVL {
         return altura(n.izquierdo) - altura(n.derecho);
       }
     }
-    
+    private Nodo rotacionDerecha(Nodo nodo) {
+
+      Nodo nuevoPadre = nodo.izquierdo;
+      Nodo subArbol = nuevoPadre.derecho;
+
+      nuevoPadre.derecho = nodo;
+      nodo.izquierdo = subArbol;
+
+      actualizarAltura(nodo);
+      actualizarAltura(nuevoPadre);
+
+      return nuevoPadre;
+    }
+      private Nodo rotacionIzquierda(Nodo nodo) {
+
+      Nodo nuevoPadre = nodo.derecho;
+      Nodo subArbol = nuevoPadre.izquierdo;
+
+      nuevoPadre.izquierdo = nodo;
+      nodo.derecho = subArbol;
+
+      actualizarAltura(nodo);
+      actualizarAltura(nuevoPadre);
+
+      return nuevoPadre;
+     }
+      
+      
 }
