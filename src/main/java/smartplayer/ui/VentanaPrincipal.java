@@ -58,7 +58,7 @@ public class VentanaPrincipal extends JFrame {
 
 
     public VentanaPrincipal() {
-        super("🎵 Smart Player - Sistema de Gestión Musical");
+        super(" Smart Player - Sistema de Gestion Musical");
         configurarVentana();
         inicializarUI();
         setVisible(true);
@@ -87,11 +87,11 @@ public class VentanaPrincipal extends JFrame {
         pestanas.setBackground(COLOR_PANEL);
         pestanas.setForeground(COLOR_TEXTO);
         pestanas.setFont(FUENTE_TITULO);
-        pestanas.addTab("📚 Biblioteca", crearPestanaBiblioteca());
-        pestanas.addTab("🎵 Playlists", crearPestanaPlaylists());
-        pestanas.addTab("🌲 Árboles", crearPestanaArboles());
-        pestanas.addTab("📊 Estadísticas", crearPestanaEstadisticas());
-        pestanas.addTab("🔐 Encriptación", crearPestanaEncriptacion());
+        pestanas.addTab(" Biblioteca", crearPestanaBiblioteca());
+        pestanas.addTab(" Playlists", crearPestanaPlaylists());
+        pestanas.addTab(" Arboles", crearPestanaArboles());
+        pestanas.addTab(" Estadisticas", crearPestanaEstadisticas());
+        pestanas.addTab(" Encriptacion", crearPestanaEncriptacion());
         add(pestanas, BorderLayout.CENTER);
 
         // Panel inferior con reproductor
@@ -104,13 +104,13 @@ public class VentanaPrincipal extends JFrame {
         panel.setBackground(COLOR_PANEL);
         panel.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
 
-        JLabel logo = new JLabel("🎵 SMART PLAYER");
+        JLabel logo = new JLabel(" SMART PLAYER");
         logo.setFont(FUENTE_GRANDE);
         logo.setForeground(COLOR_ACENTO);
 
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         panelBotones.setBackground(COLOR_PANEL);
-        JButton btnCargar = crearBoton("📂 Cargar Biblioteca", COLOR_ACENTO2);
+        JButton btnCargar = crearBoton(" Cargar Biblioteca", COLOR_ACENTO2);
         btnCargar.addActionListener(e -> accionCargarBiblioteca());
         panelBotones.add(btnCargar);
 
@@ -136,10 +136,10 @@ public class VentanaPrincipal extends JFrame {
         txtBuscar = new JTextField(25);
         estilizar(txtBuscar);
 
-        JButton btnBuscar = crearBoton("🔍 Buscar", COLOR_ACENTO);
+        JButton btnBuscar = crearBoton(" Buscar", COLOR_ACENTO);
         btnBuscar.addActionListener(e -> accionBuscar());
 
-        JButton btnLimpiar = crearBoton("✖ Limpiar", new Color(180, 50, 50));
+        JButton btnLimpiar = crearBoton(" Limpiar", new Color(180, 50, 50));
         btnLimpiar.addActionListener(e -> refrescarTablaBiblioteca(null));
 
         panelBusqueda.add(new JLabel("Buscar por:") {
@@ -153,7 +153,7 @@ public class VentanaPrincipal extends JFrame {
         panelBusqueda.add(btnLimpiar);
 
         // Tabla
-        String[] columnas = {"Nombre", "Artista", "Album", "Genero", "DuracioSn", "Tamaño", "Año", "Ruta"};
+        String[] columnas = {"Nombre", "Artista", "Album", "Genero", "Duracion", "Tamaño", "Año", "Ruta"};
         modeloBiblioteca = new DefaultTableModel(columnas, 0) {
             @Override
             public boolean isCellEditable(int r, int c) {
@@ -176,8 +176,8 @@ public class VentanaPrincipal extends JFrame {
         // Barra inferior con acciones rapidas
         JPanel panelAcciones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
         panelAcciones.setBackground(COLOR_FONDO);
-        JButton btnAgregarCola = crearBoton("➕ Cola", new Color(100, 100, 200));
-        JButton btnAgregarPlaylist = crearBoton("📋 Agregar a Playlist", new Color(100, 160, 100));
+        JButton btnAgregarCola = crearBoton(" Cola", new Color(100, 100, 200));
+        JButton btnAgregarPlaylist = crearBoton(" Agregar a Playlist", new Color(100, 160, 100));
         btnAgregarCola.addActionListener(e -> accionAgregarACola());
         btnAgregarPlaylist.addActionListener(e -> accionAgregarAPlaylist());
         panelAcciones.add(btnAgregarCola);
@@ -210,10 +210,10 @@ public class VentanaPrincipal extends JFrame {
         
         JPanel panelBotonesP = new JPanel(new GridLayout(4, 1, 4, 4));
         panelBotonesP.setBackground(COLOR_FONDO);
-        JButton btnNueva = crearBoton("➕ Nueva", COLOR_ACENTO);
-        JButton btnEliminar = crearBoton("🗑 Eliminar", new Color(180, 50, 50));
-        JButton btnExportar = crearBoton("💾 Exportar", COLOR_ACENTO2);
-        JButton btnImportar = crearBoton("📂 Importar", new Color(150, 100, 200));
+        JButton btnNueva = crearBoton(" Nueva", COLOR_ACENTO);
+        JButton btnEliminar = crearBoton(" Eliminar", new Color(180, 50, 50));
+        JButton btnExportar = crearBoton(" Exportar", COLOR_ACENTO2);
+        JButton btnImportar = crearBoton(" Importar", new Color(150, 100, 200));
         btnNueva.addActionListener(e -> accionNuevaPlaylist());
         btnEliminar.addActionListener(e -> accionEliminarPlaylist());
         panelBotonesP.add(btnNueva);
@@ -227,7 +227,7 @@ public class VentanaPrincipal extends JFrame {
         panelIzq.add(panelBotonesP, BorderLayout.SOUTH);
 
         // Tabla de canciones de la playlist (derecha)
-        String[] columnas = {"Nombre", "Artista", "Álbum", "Género", "Duración"};
+        String[] columnas = {"Nombre", "Artista", "Album", "Genero", "Duracion"};
         modeloPlaylist = new DefaultTableModel(columnas, 0) {
             @Override
             public boolean isCellEditable(int r, int c) {
@@ -239,8 +239,8 @@ public class VentanaPrincipal extends JFrame {
         scrollCanciones.getViewport().setBackground(COLOR_FONDO);
         titularPanel(scrollCanciones, "Canciones de la Playlist");
 
-        JButton btnEliminarCancion = crearBoton("🗑 Quitar canción", new Color(180, 50, 50));
-        JButton btnReproducir = crearBoton("▶ Reproducir Playlist", COLOR_ACENTO);
+        JButton btnEliminarCancion = crearBoton(" Quitar cancion", new Color(180, 50, 50));
+        JButton btnReproducir = crearBoton(" Reproducir Playlist", COLOR_ACENTO);
         btnEliminarCancion.addActionListener(e -> accionQuitarCancionPlaylist());
         btnReproducir.addActionListener(e -> accionReproducirPlaylist());
         JPanel panelSurP = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
@@ -286,9 +286,9 @@ public class VentanaPrincipal extends JFrame {
             crearBoton("AVL InOrden", COLOR_ACENTO),
             crearBoton("AVL PreOrden", COLOR_ACENTO),
             crearBoton("AVL PostOrden", COLOR_ACENTO),
-            crearBoton("📊 Comparar Carga", new Color(200, 100, 0)),
-            crearBoton("🌲 Graphviz ABB", new Color(100, 0, 200)),
-            crearBoton("🌲 Graphviz AVL", new Color(100, 0, 200)),};
+            crearBoton(" Comparar Carga", new Color(200, 100, 0)),
+            crearBoton(" Graphviz ABB", new Color(100, 0, 200)),
+            crearBoton(" Graphviz AVL", new Color(100, 0, 200)),};
 
         botones[6].addActionListener(e -> mostrarComparativaCarga());
 
@@ -333,17 +333,17 @@ public class VentanaPrincipal extends JFrame {
 
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         panelBotones.setBackground(COLOR_FONDO);
-        JButton btnActualizar = crearBoton("🔄 Actualizar", COLOR_ACENTO);
-        JButton btnDuplicados = crearBoton("🔍 Ver Duplicados", new Color(200, 100, 0));
+        JButton btnActualizar = crearBoton(" Actualizar", COLOR_ACENTO);
+        JButton btnDuplicados = crearBoton(" Ver Duplicados", new Color(200, 100, 0));
 
-        String[] tipos = {"Buscar (nombre):", "Buscar (artista):", "Buscar (álbum):"};
+        String[] tipos = {"Buscar (nombre):", "Buscar (artista):", "Buscar (album):"};
         JTextField txtMedir = new JTextField(20);
         estilizar(txtMedir);
-        JButton btnMedir = crearBoton("⏱ Medir Búsqueda", COLOR_ACENTO2);
+        JButton btnMedir = crearBoton(" Medir Busqueda", COLOR_ACENTO2);
 
         panelBotones.add(btnActualizar);
         panelBotones.add(btnDuplicados);
-        panelBotones.add(new JLabel("Término:") {
+        panelBotones.add(new JLabel("Termino:") {
             {
                 setForeground(COLOR_TEXTO);
             }
@@ -380,8 +380,8 @@ public class VentanaPrincipal extends JFrame {
         txtNombrePlaylist.setToolTipText("Nombre de la playlist");
         estilizar(txtNombrePlaylist);
 
-        JButton btnEnc = crearBoton("🔐 Encriptar y Exportar", new Color(180, 50, 220));
-        JButton btnDec = crearBoton("🔓 Importar y Desencriptar", COLOR_ACENTO2);
+        JButton btnEnc = crearBoton(" Encriptar y Exportar", new Color(180, 50, 220));
+        JButton btnDec = crearBoton(" Importar y Desencriptar", COLOR_ACENTO2);
 
         panelBotones.add(new JLabel("Playlist:") {
             {
@@ -413,7 +413,7 @@ public class VentanaPrincipal extends JFrame {
         // Info de la cancion
         JPanel panelInfo = new JPanel(new GridLayout(2, 1));
         panelInfo.setBackground(COLOR_PANEL);
-        lblCancionActual = new JLabel("Sin reproducción");
+        lblCancionActual = new JLabel("Sin reproduccion");
         lblCancionActual.setForeground(COLOR_TEXTO);
         lblCancionActual.setFont(FUENTE_TITULO);
         lblArtista = new JLabel("—");
@@ -456,7 +456,7 @@ public class VentanaPrincipal extends JFrame {
         // Controles de modo
         JPanel panelModo = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
         panelModo.setBackground(COLOR_PANEL);
-        comboModo = new JComboBox<>(new String[]{"▶ Normal", "🔀 Aleatorio", "🔁 Circular"});
+        comboModo = new JComboBox<>(new String[]{" Normal", " Aleatorio", " Circular"});
         estilizar(comboModo);
         comboModo.addActionListener(e -> {
             ReproductorMusical.ModoReproduccion[] modos = {
@@ -505,7 +505,7 @@ public class VentanaPrincipal extends JFrame {
                     List<Cancion> canciones = get();
                     refrescarTablaBiblioteca(canciones);
                     JOptionPane.showMessageDialog(VentanaPrincipal.this,
-                            "✅ Cargadas " + canciones.size() + " canciones.\n"
+                            " Cargadas " + canciones.size() + " canciones.\n"
                             + biblioteca.getResumenComparativaCarga(),
                             "Carga completada", JOptionPane.INFORMATION_MESSAGE);
                 } catch (Exception ex) {
@@ -637,14 +637,11 @@ public class VentanaPrincipal extends JFrame {
         }
     }
 
-    private void accionEliminarPlaylist() {
-        String sel = listaPlaylists.getSelectedValue();
+    private void accionEliminarPlaylist() {String sel = listaPlaylists.getSelectedValue();
         if (sel == null) {
             return;
         }
-        int conf = JOptionPane.showConfirmDialog(this,
-                "Eliminar la playlist '" + sel + "'?", "Confirmar",
-                JOptionPane.YES_NO_OPTION);
+        int conf = JOptionPane.showConfirmDialog(this, "Eliminar la playlist '" + sel + "'?", "Confirmar", JOptionPane.YES_NO_OPTION);
         if (conf == JOptionPane.YES_OPTION) {
             gestor.eliminarPlaylist(sel);
             refrescarListaPlaylists();
@@ -652,97 +649,206 @@ public class VentanaPrincipal extends JFrame {
         }
     }
 
-    private void accionQuitarCancionPlaylist() {
-        String selP = listaPlaylists.getSelectedValue();
-        int filaC = tablaPlaylist.getSelectedRow();
-        if (selP == null || filaC < 0) {
-            return;
-        }
-        String nombreC = (String) modeloPlaylist.getValueAt(filaC, 0);
-        gestor.eliminarCancion(selP, nombreC);
-        mostrarCancionesPlaylist();
+    private void accionQuitarCancionPlaylist() { String playlistSeleccionada = listaPlaylists.getSelectedValue();
+    int filaSeleccionada = tablaPlaylist.getSelectedRow();
+
+    if (playlistSeleccionada == null || filaSeleccionada < 0) {
+        return;
+    }
+
+    String nombreCancion = (String) modeloPlaylist.getValueAt(filaSeleccionada, 0);
+
+    gestor.eliminarCancion(playlistSeleccionada, nombreCancion);
+    mostrarCancionesPlaylist();
     }
 
     private void accionReproducirPlaylist() {
-        String sel = listaPlaylists.getSelectedValue();
-        if (sel == null) {
-            return;
-        }
-        Playlist p = gestor.buscarPlaylist(sel);
-        for (Cancion c : p.getCanciones()) {
-            reproductor.encolar(c);
-        }
-        reproductor.setModo(
-                reproductor.getModo() == ReproductorMusical.ModoReproduccion.CIRCULAR
-                ? ReproductorMusical.ModoReproduccion.CIRCULAR
-                : ReproductorMusical.ModoReproduccion.NORMAL);
-        Cancion primera = p.getCanciones().getPrimero();
-        if (primera != null) {
-            reproductor.reproducir(primera);
-            lblCancionActual.setText(primera.getNombre());
-            lblArtista.setText(primera.getArtista());
-        }
+
+    String nombrePlaylist = listaPlaylists.getSelectedValue();
+
+    if (nombrePlaylist == null) {
+        return;
     }
 
+    Playlist playlist = gestor.buscarPlaylist(nombrePlaylist);
+
+    if (playlist == null) {
+        return;
+    }
+
+    // Agrega todas las canciones a la cola
+    for (Cancion cancion : playlist.getCanciones()) {
+        reproductor.encolar(cancion);
+    }
+
+    // Mantiene el modo circular si ya estaba activo
+    if (reproductor.getModo()
+        != ReproductorMusical.ModoReproduccion.CIRCULAR) {
+        reproductor.setModo( ReproductorMusical.ModoReproduccion.NORMAL);
+    }
+
+    Cancion primeraCancion = playlist.getCanciones().getPrimero();
+
+        if (primeraCancion != null) {
+        reproductor.reproducir(primeraCancion);
+        lblCancionActual.setText(primeraCancion.getNombre());
+        lblArtista.setText(primeraCancion.getArtista());
+        }
+    }
+    
     private void accionPlay() {
-        if (reproductor.isPausado()) {
-            reproductor.continuar();
+         if (reproductor.isPausado()) {
+        reproductor.continuar();
+    } else {
+        accionReproducirSeleccionada();
+       }
+    }
+    
+   private void mostrarRecorrido(String arbol, String tipo) {
+
+      if (biblioteca.getAbb().isEmpty()) {
+        areaLog.setText("Carga la biblioteca primero.");
+        return;
+    }
+        List<Cancion> lista;
+
+        if (arbol.equals("ABB")) {
+        if (tipo.equals("INORDEN")) {
+            lista = biblioteca.getAbb().inOrden();
+        } else if (tipo.equals("PREORDEN")) {
+            lista = biblioteca.getAbb().preOrden();
         } else {
-            accionReproducirSeleccionada();
+            lista = biblioteca.getAbb().postOrden();
+        }
+    } else {
+        if (tipo.equals("INORDEN")) {
+            lista = biblioteca.getAvl().inOrden();
+        } else if (tipo.equals("PREORDEN")) {
+            lista = biblioteca.getAvl().preOrden();
+        } else {
+            lista = biblioteca.getAvl().postOrden();
         }
     }
+       StringBuilder texto = new StringBuilder();
+       texto.append("=== ").append(arbol)
+         .append(" ").append(tipo)
+         .append(" ===\n");
 
+        int contador = 1;
+
+        for (Cancion cancion : lista) {
+        texto.append(contador)
+             .append(". ")
+             .append(cancion.getArtista())
+             .append(" - ")
+             .append(cancion.getNombre())
+             .append("\n"); contador++;
+
+        if (contador > 500) {
+            texto.append("... ");
+            break;
+        }
+    }
+    areaLog.setText(texto.toString());
+    areaLog.setCaretPosition(0);
+}
+      
     private void mostrarComparativaCarga() {
         areaLog.setText(biblioteca.getResumenComparativaCarga());
     }
 
     //  HELPERS DE UI
     private void refrescarTablaBiblioteca(List<Cancion> canciones) {
-        modeloBiblioteca.setRowCount(0);
-        Iterable<Cancion> fuente = (canciones != null)
-                ? canciones
-                : biblioteca.getListaBiblioteca();
-        for (Cancion c : fuente) {
+
+    modeloBiblioteca.setRowCount(0);
+    if (canciones == null) {
+        for (Cancion c : biblioteca.getListaBiblioteca()) {
             modeloBiblioteca.addRow(new Object[]{
-                c.getNombre(), c.getArtista(), c.getAlbum(), c.getGenero(),
-                c.getDuracionFormateada(), c.getTamanoFormateado(), c.getAnio(), c.getRuta()
+                c.getNombre(),
+                c.getArtista(),
+                c.getAlbum(),
+                c.getGenero(),
+                c.getDuracionFormateada(),
+                c.getTamanoFormateado(),
+                c.getAnio(),
+                c.getRuta()
             });
         }
+    } else {
+        for (Cancion c : canciones) {
+            modeloBiblioteca.addRow(new Object[]{
+                c.getNombre(),
+                c.getArtista(),
+                c.getAlbum(),
+                c.getGenero(),
+                c.getDuracionFormateada(),
+                c.getTamanoFormateado(),
+                c.getAnio(),
+                c.getRuta()
+            });
+        }
+      }
     }
 
-    private void refrescarListaPlaylists() {
-        modeloListaPlaylists.clear();
+    private void refrescarListaPlaylists() {modeloListaPlaylists.clear();
+
         for (Playlist p : gestor.getTodas()) {
-            modeloListaPlaylists.addElement(p.getNombre());
-        }
+        modeloListaPlaylists.addElement(p.getNombre());
+      }
     }
 
     private void refrescarCancionReproducida() {
-        Cancion actual = reproductor.getCancionActual();
+        Cancion cancion = reproductor.getCancionActual();
 
-        if (actual != null) {
-            lblCancionActual.setText(actual.getNombre());
-            lblArtista.setText(actual.getArtista() + " • " + actual.getAlbum());
-        }
+        if (cancion != null) {
+         String nombre = cancion.getNombre();
+         String info = cancion.getArtista() + " - " + cancion.getAlbum();
+
+        lblCancionActual.setText(nombre);
+        lblArtista.setText(info);
+       }
     }
 
-    private void mostrarCancionesPlaylist() {
-        modeloPlaylist.setRowCount(0);
-        String sel = listaPlaylists.getSelectedValue();
-        if (sel == null) {
-            return;
-        }
-        Playlist p = gestor.buscarPlaylist(sel);
-        if (p == null) {
-            return;
-        }
-        for (Cancion c : p.getCanciones()) {
-            modeloPlaylist.addRow(new Object[]{
-                c.getNombre(), c.getArtista(), c.getAlbum(), c.getGenero(), c.getDuracionFormateada()
-            });
-        }
+    private void mostrarCancionesPlaylist() { modeloPlaylist.setRowCount(0);
+
+         String nombrePlaylist = listaPlaylists.getSelectedValue();
+         if (nombrePlaylist == null) {
+             
+        return;
     }
 
+    // Buscar playlist
+    Playlist playlist = gestor.buscarPlaylist(nombrePlaylist);
+
+         if (playlist == null) {
+             
+        return;
+    }
+
+    // Mostrar canciones
+        for (Cancion cancion : playlist.getCanciones()) {
+        modeloPlaylist.addRow(new Object[]{
+            cancion.getNombre(),
+            cancion.getArtista(),
+            cancion.getAlbum(),
+            cancion.getGenero(),
+            cancion.getDuracionFormateada()
+        });
+       }
+    }
+    
+     private void actualizarEstadoArboles() {
+        lblEstABB.setText(
+            "ABB: " + biblioteca.getAbb().getTotalNodos()
+            + " nodos | Altura: "
+            + biblioteca.getAbb().getAltura()
+    );
+    lblEstAVL.setText(
+            "AVL: " + biblioteca.getAvl().getTotalNodos()
+            + " nodos | Altura: "
+            + biblioteca.getAvl().getAltura()
+    );
+}
     private JTable crearTabla(DefaultTableModel modelo) {
         JTable tabla = new JTable(modelo) {
             @Override
