@@ -4,6 +4,8 @@
  */
 package smartplayer.structures;
 
+import java.util.ArrayList;
+import java.util.List;
 import smartplayer.model.Cancion;
 
 /**
@@ -154,6 +156,59 @@ public class ArbolAVL {
     }
 
     return nodo;
-  }
-      
+   }
+    
+    public List<Cancion> buscarPorArtista(String artista) {
+
+    List<Cancion> cancionesEncontradas = new ArrayList<>();
+    buscarArtista(raiz, artista.toLowerCase(), cancionesEncontradas);
+
+    return cancionesEncontradas;
+    }
+
+    private void buscarArtista(Nodo nodo, String artista, List<Cancion> cancionesEncontradas) {
+
+    if (nodo == null) {
+        return;
+    }
+
+    if (nodo.cancion.getArtista().toLowerCase().contains(artista)) {
+        cancionesEncontradas.add(nodo.cancion);
+    }
+
+    buscarArtista(nodo.izquierdo, artista, cancionesEncontradas);
+    buscarArtista(nodo.derecho, artista, cancionesEncontradas);
+    }
+
+    public List<Cancion> buscarPorAlbum(String album) {
+
+    List<Cancion> cancionesEncontradas = new ArrayList<>();
+
+    buscarAlbum(raiz, album.toLowerCase(), cancionesEncontradas);
+
+    return cancionesEncontradas;
+    }
+
+    private void buscarAlbum(Nodo nodo, String album, List<Cancion> cancionesEncontradas) {
+
+    if (nodo == null) {
+        return;
+    }
+
+    if (nodo.cancion.getAlbum().toLowerCase().contains(album)) {
+        cancionesEncontradas.add(nodo.cancion);
+    }
+
+    buscarAlbum(nodo.izquierdo, album, cancionesEncontradas);
+    buscarAlbum(nodo.derecho, album, cancionesEncontradas);
+    }
+
+    public List<Cancion> buscarPorGenero(String genero) {
+
+    List<Cancion> cancionesEncontradas = new ArrayList<>();
+
+    buscarGeneroRec(raiz, genero.toLowerCase(), cancionesEncontradas);
+
+    return cancionesEncontradas;
+    }
 }
