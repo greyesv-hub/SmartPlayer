@@ -25,7 +25,7 @@ public class ArbolBinarioBusqueda {
     private int  totalNodos;
 
     public void insertar(Cancion c) {
-        raiz = insertarRec(raiz, c);
+        raiz = insertarNodo(raiz, c);
     }
 
    // Insertar una cancion en el arbol
@@ -78,57 +78,87 @@ public class ArbolBinarioBusqueda {
     }
 
     public List<Cancion> buscarPorArtista(String artista) {
-        List<Cancion> resultado = new ArrayList<>();
-        buscarArtistaRec(raiz, artista.toLowerCase(), resultado);
-        return resultado;
+
+    List<Cancion> cancionesEncontradas = new ArrayList<>();
+    buscarArtista(raiz, artista.toLowerCase(), cancionesEncontradas);
+
+    return cancionesEncontradas;
+}
+
+    private void buscarArtista(Nodo nodo, String artista, List<Cancion> cancionesEncontradas) {
+
+    if (nodo == null) {
+        return;
     }
 
-    private void buscarArtistaRec(Nodo n, String artista, List<Cancion> res) {
-        if (n == null) return;
-        if (n.cancion.getArtista().toLowerCase().contains(artista)) res.add(n.cancion);
-        buscarArtistaRec(n.izquierdo, artista, res);
-        buscarArtistaRec(n.derecho,   artista, res);
+    if (nodo.cancion.getArtista().toLowerCase().contains(artista)) {
+        cancionesEncontradas.add(nodo.cancion);
+    }
+
+    buscarArtista(nodo.izquierdo, artista, cancionesEncontradas);
+    buscarArtista(nodo.derecho, artista, cancionesEncontradas);
     }
 
     public List<Cancion> buscarPorAlbum(String album) {
-        List<Cancion> resultado = new ArrayList<>();
-        buscarAlbumRec(raiz, album.toLowerCase(), resultado);
-        return resultado;
+
+    List<Cancion> cancionesEncontradas = new ArrayList<>();
+    buscarAlbum(raiz, album.toLowerCase(), cancionesEncontradas);
+
+    return cancionesEncontradas;
     }
 
-    private void buscarAlbumRec(Nodo n, String album, List<Cancion> res) {
-        if (n == null) return;
-        if (n.cancion.getAlbum().toLowerCase().contains(album)) res.add(n.cancion);
-        buscarAlbumRec(n.izquierdo, album, res);
-        buscarAlbumRec(n.derecho,   album, res);
+    private void buscarAlbum(Nodo nodo, String album, List<Cancion> cancionesEncontradas) {
+
+    if (nodo == null) {
+        return;
+    }
+
+    if (nodo.cancion.getAlbum() .toLowerCase().contains(album)) {
+        cancionesEncontradas.add(nodo.cancion);
+    }
+    buscarAlbum(nodo.izquierdo, album, cancionesEncontradas);
+    buscarAlbum(nodo.derecho, album, cancionesEncontradas);
     }
 
     public List<Cancion> buscarPorGenero(String genero) {
-        List<Cancion> resultado = new ArrayList<>();
-        buscarGeneroRec(raiz, genero.toLowerCase(), resultado);
-        return resultado;
+
+    List<Cancion> cancionesEncontradas = new ArrayList<>();
+
+    buscarGenero(raiz, genero.toLowerCase(), cancionesEncontradas);
+    return cancionesEncontradas;
     }
 
-    private void buscarGeneroRec(Nodo n, String genero, List<Cancion> res) {
-        if (n == null) return;
-        if (n.cancion.getGenero().toLowerCase().contains(genero)) res.add(n.cancion);
-        buscarGeneroRec(n.izquierdo, genero, res);
-        buscarGeneroRec(n.derecho,   genero, res);
+    private void buscarGenero(Nodo nodo, String genero, List<Cancion> cancionesEncontradas) {
+
+    if (nodo == null) {
+        return;
     }
 
-
-    public boolean modificar(String nombre, Cancion nueva) {
-        Nodo n = buscarRec(raiz, nombre);
-        if (n == null) return false;
-        n.cancion = nueva;
-        return true;
+    if (nodo.cancion.getGenero().toLowerCase().contains(genero)) {
+        cancionesEncontradas.add(nodo.cancion);
     }
 
+    buscarGenero(nodo.izquierdo, genero, cancionesEncontradas);
+    buscarGenero(nodo.derecho, genero, cancionesEncontradas);
+    }
+
+    public boolean modificar(String nombre, Cancion nuevaCancion) {
+    Nodo encontrado = buscarNodo(raiz, nombre);
+
+    if (encontrado == null) {
+        return false;
+    }
+    encontrado.cancion = nuevaCancion;
+    return true;
+    }
 
     public boolean eliminar(String nombre) {
-        int[] contador = {0};
-        raiz = eliminarRec(raiz, nombre, contador);
-        return contador[0] > 0;
+
+    int[] cancionesEliminadas = {0};
+    raiz = eliminarNodo(raiz,nombre, cancionesEliminadas
+    );
+
+    return cancionesEliminadas[0] > 0;
     }
 
     private Nodo eliminarRec(Nodo nodo, String nombre, int[] cont) {
