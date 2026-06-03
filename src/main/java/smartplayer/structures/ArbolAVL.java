@@ -4,10 +4,51 @@
  */
 package smartplayer.structures;
 
+import smartplayer.model.Cancion;
+
 /**
- *
+ *Mantiene balance en todo momento mediante rotaciones simples y dobles
  * @author rmari
  */
 public class ArbolAVL {
+    
+      // Nodo interno 
+    public static class Nodo {
+        public Cancion cancion;
+        public Nodo izquierdo;
+        public Nodo derecho;
+        public int altura;
+        Nodo(Cancion c) { this.cancion = c; this.altura = 1; }
+    }
+
+    private Nodo raiz;
+    private int  totalNodos;
+
+    private int altura(Nodo n){        
+    if (n == null) {
+        return 0;
+    } else {
+        return n.altura;
+      } 
+    }
+    
+    private void actualizarAltura(Nodo n) {    
+    int alturaIzquierda = altura(n.izquierdo);
+    int alturaDerecha = altura(n.derecho);
+
+    if (alturaIzquierda > alturaDerecha) {
+        n.altura = alturaIzquierda + 1;
+    } else {
+        n.altura = alturaDerecha + 1;
+      }
+    }
+    
+    private int factorBalance(Nodo n) {
+    if (n == null) {
+        return 0;
+    } else {
+        return altura(n.izquierdo) - altura(n.derecho);
+      }
+    }
     
 }
