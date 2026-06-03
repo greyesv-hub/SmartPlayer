@@ -77,5 +77,33 @@ public class ArbolAVL {
       return nuevoPadre;
      }
       
+    private Nodo rotacionIzquierdaDerecha(Nodo n) {
+        n.izquierdo = rotacionIzquierda(n.izquierdo);
+        return rotacionDerecha(n);
+    }
+
+    private Nodo rotacionDerechaIzquierda(Nodo n) {
+        n.derecho = rotacionDerecha(n.derecho);
+        return rotacionIzquierda(n);
+    }
+
+    private Nodo balancear(Nodo nodo) {
+        actualizarAltura(nodo);
+        int fb = factorBalance(nodo);
+
+        if (fb > 1 && factorBalance(nodo.izquierdo) >= 0)
+            return rotacionDerecha(nodo);
+
+        if (fb > 1 && factorBalance(nodo.izquierdo) < 0)
+            return rotacionIzquierdaDerecha(nodo);
+
+        if (fb < -1 && factorBalance(nodo.derecho) <= 0)
+            return rotacionIzquierda(nodo);
+
+        if (fb < -1 && factorBalance(nodo.derecho) > 0)
+            return rotacionDerechaIzquierda(nodo);
+
+        return nodo; 
+    }
       
 }
