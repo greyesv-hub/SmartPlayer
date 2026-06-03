@@ -290,4 +290,77 @@ public class ArbolAVL {
 
     return nodo;
     }
+    
+    public List<Cancion> inOrden() {
+    List<Cancion> canciones = new ArrayList<>();
+    recorrerInOrden(raiz, canciones);
+
+    return canciones;
+    }
+
+    private void recorrerInOrden(Nodo nodo, List<Cancion> canciones) {
+
+    if (nodo == null) {
+        return;
+    }
+    recorrerInOrden(nodo.izquierdo, canciones);
+    canciones.add(nodo.cancion);
+    recorrerInOrden(nodo.derecho, canciones);
+    }
+
+    public List<Cancion> preOrden() {
+
+    List<Cancion> canciones = new ArrayList<>();
+    recorrerPreOrden(raiz, canciones);
+
+    return canciones;
+    }
+
+    private void recorrerPreOrden(Nodo nodo, List<Cancion> canciones) {
+
+    if (nodo == null) {
+        return;
+    }
+    canciones.add(nodo.cancion);
+    recorrerPreOrden(nodo.izquierdo, canciones);
+    recorrerPreOrden(nodo.derecho, canciones);
+    }
+
+    public List<Cancion> postOrden() {
+
+    List<Cancion> canciones = new ArrayList<>();
+    recorrerPostOrden(raiz, canciones);
+
+    return canciones;
+    }
+
+    private void recorrerPostOrden(Nodo nodo, List<Cancion> canciones) {
+
+    if (nodo == null) {
+        return;
+    }
+    recorrerPostOrden(nodo.izquierdo, canciones);
+    recorrerPostOrden(nodo.derecho, canciones);
+    canciones.add(nodo.cancion);
+    }
+
+    public int getTotalNodos() {
+    return totalNodos;
+    }
+
+    public boolean estaVacio() {
+    return raiz == null;
+    }
+
+    public Nodo getRaiz() {
+    return raiz;
+    }
+
+    public int getAltura() {
+    return altura(raiz);
+    }
+
+    public int getFactorBalanceRaiz() {
+    return factorBalance(raiz);
+    }
 }
