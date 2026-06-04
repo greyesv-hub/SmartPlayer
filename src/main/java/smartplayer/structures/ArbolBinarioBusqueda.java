@@ -96,80 +96,39 @@ public class ArbolBinarioBusqueda {
     return resultado;
 }
 
-private void buscarAlbumRec(
-        Nodo nodo,
-        String album,
-        List<Cancion> resultado) {
+    private void buscarAlbumRec(Nodo nodo, String album, List<Cancion> resultado) {
 
     if (nodo == null) {
         return;
     }
 
-    if (nodo.cancion.getAlbum()
-            .toLowerCase()
-            .contains(album)) {
-
+    if (nodo.cancion.getAlbum().toLowerCase().contains(album)) {
         resultado.add(nodo.cancion);
     }
 
-    buscarAlbumRec(
-            nodo.izquierdo,
-            album,
-            resultado
-    );
-
-    buscarAlbumRec(
-            nodo.derecho,
-            album,
-            resultado
-    );
+    buscarAlbumRec(nodo.izquierdo,album,resultado);
+    buscarAlbumRec(nodo.derecho, album, resultado);
 }
 
-// ── Búsqueda por género ───────────────────────────────────────────────
+    public List<Cancion> buscarPorGenero(String genero) {List<Cancion> resultado = new ArrayList<>();
 
-public List<Cancion> buscarPorGenero(String genero) {
-
-    List<Cancion> resultado = new ArrayList<>();
-
-    buscarGeneroRec(
-            raiz,
-            genero.toLowerCase(),
-            resultado
-    );
-
+    buscarGeneroRec(raiz, genero.toLowerCase(), resultado);
     return resultado;
 }
 
-private void buscarGeneroRec(
-        Nodo nodo,
-        String genero,
-        List<Cancion> resultado) {
+    private void buscarGeneroRec(Nodo nodo,String genero,List<Cancion> resultado) {
 
     if (nodo == null) {
         return;
     }
 
-    if (nodo.cancion.getGenero()
-            .toLowerCase()
-            .contains(genero)) {
-
+    if (nodo.cancion.getGenero().toLowerCase().contains(genero)) {
         resultado.add(nodo.cancion);
     }
 
-    buscarGeneroRec(
-            nodo.izquierdo,
-            genero,
-            resultado
-    );
-
-    buscarGeneroRec(
-            nodo.derecho,
-            genero,
-            resultado
-    );
+    buscarGeneroRec(nodo.izquierdo, genero, resultado);
+    buscarGeneroRec(nodo.derecho, genero, resultado);
 }
-
-    // ── Modificación ───────────────────────────────────────────────────────
 
     public boolean modificar(String nombre, Cancion nueva) {
         Nodo n = buscarRec(raiz, nombre);
