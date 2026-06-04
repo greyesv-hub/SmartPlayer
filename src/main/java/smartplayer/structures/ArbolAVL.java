@@ -9,11 +9,12 @@ import java.util.List;
 import smartplayer.model.Cancion;
 
 /**
- *Mantiene balance en todo momento mediante rotaciones simples y dobles
+ *
  * @author rmari
  */
 public class ArbolAVL {
 
+    // ── Nodo interno ───────────────────────────────────────────────────────
     public static class Nodo {
         public Cancion cancion;
         public Nodo izquierdo;
@@ -25,342 +26,218 @@ public class ArbolAVL {
     private Nodo raiz;
     private int  totalNodos;
 
-    private int altura(Nodo n){        
-    if (n == null) {
-        return 0;
-    } else {
-        return n.altura;
-      } 
-    }
-    
-    private void actualizarAltura(Nodo n) {    
-    int alturaIzquierda = altura(n.izquierdo);
-    int alturaDerecha = altura(n.derecho);
+    // ── Altura y factor de balance ─────────────────────────────────────────
 
-    if (alturaIzquierda > alturaDerecha) {
-        n.altura = alturaIzquierda + 1;
-    } else {
-        n.altura = alturaDerecha + 1;
-      }
+    private int altura(Nodo n)       { return (n == null) ? 0 : n.altura; }
+
+    private void actualizarAltura(Nodo n) {
+        n.altura = 1 + Math.max(altura(n.izquierdo), altura(n.derecho));
     }
-    
+
     private int factorBalance(Nodo n) {
-    if (n == null) {
-        return 0;
-    } else {
-        return altura(n.izquierdo) - altura(n.derecho);
-      }
+        return (n == null) ? 0 : altura(n.izquierdo) - altura(n.derecho);
     }
-    private Nodo rotacionDerecha(Nodo nodo) {
 
-      Nodo nuevoPadre = nodo.izquierdo;
-      Nodo subArbol = nuevoPadre.derecho;
+      // ── Rotaciones ─────────────────────────────────────────────────────────
 
-      nuevoPadre.derecho = nodo;
-      nodo.izquierdo = subArbol;
-
-      actualizarAltura(nodo);
-      actualizarAltura(nuevoPadre);
-
-      return nuevoPadre;
+    /** Rotación Simple Derecha (RD) */
+    private Nodo rotacionDerecha(Nodo y) {
+        Nodo x  = y.izquierdo;
+        Nodo T2 = x.derecho;
+        x.derecho   = y;
+        y.izquierdo = T2;
+        actualizarAltura(y);
+        actualizarAltura(x);
+        return x;
     }
-      private Nodo rotacionIzquierda(Nodo nodo) {
 
-      Nodo nuevoPadre = nodo.derecho;
-      Nodo subArbol = nuevoPadre.izquierdo;
+    /** Rotación Simple Izquierda (RI) */
+    private Nodo rotacionIzquierda(Nodo x) {
+        Nodo y  = x.derecho;
+        Nodo T2 = y.izquierdo;
+        y.izquierdo = x;
+        x.derecho   = T2;
+        actualizarAltura(x);
+        actualizarAltura(y);
+        return y;
+    }
 
-      nuevoPadre.izquierdo = nodo;
-      nodo.derecho = subArbol;
-
-      actualizarAltura(nodo);
-      actualizarAltura(nuevoPadre);
-
-      return nuevoPadre;
-     }
-      
+    /** Rotación Doble Izquierda-Derecha (RID) */
     private Nodo rotacionIzquierdaDerecha(Nodo n) {
         n.izquierdo = rotacionIzquierda(n.izquierdo);
         return rotacionDerecha(n);
     }
 
+    /** Rotación Doble Derecha-Izquierda (RDI) */
     private Nodo rotacionDerechaIzquierda(Nodo n) {
         n.derecho = rotacionDerecha(n.derecho);
         return rotacionIzquierda(n);
     }
 
+      /** Aplica la rotación correcta según el factor de balance */
     private Nodo balancear(Nodo nodo) {
         actualizarAltura(nodo);
         int fb = factorBalance(nodo);
 
+        // Caso izquierda-izquierda → RD
         if (fb > 1 && factorBalance(nodo.izquierdo) >= 0)
             return rotacionDerecha(nodo);
 
+        // Caso izquierda-derecha → RID
         if (fb > 1 && factorBalance(nodo.izquierdo) < 0)
             return rotacionIzquierdaDerecha(nodo);
 
+        // Caso derecha-derecha → RI
         if (fb < -1 && factorBalance(nodo.derecho) <= 0)
             return rotacionIzquierda(nodo);
 
+        // Caso derecha-izquierda → RDI
         if (fb < -1 && factorBalance(nodo.derecho) > 0)
             return rotacionDerechaIzquierda(nodo);
 
-        return nodo; 
-    }
-      public void insertar(Cancion cancion) {
-      raiz = insertarNodo(raiz, cancion);
+        return nodo; // ya balanceado
     }
 
-      private Nodo insertarNodo(Nodo nodo, Cancion cancion) { 
-      if (nodo == null) {
-        totalNodos++;
-        return new Nodo(cancion);
-    }
-      int resultado = cancion.compareTo(nodo.cancion);
-      if (resultado < 0) {
-        nodo.izquierdo = insertarNodo(nodo.izquierdo, cancion);
-    } else if (resultado > 0) {
-        nodo.derecho = insertarNodo(nodo.derecho, cancion);
-    } else {
-        return nodo; // la canción ya existe
+    // ── Inserción ──────────────────────────────────────────────────────────
+
+    public void insertar(Cancion c) {
+        raiz = insertarRec(raiz, c);
     }
 
+    private Nodo insertarRec(Nodo nodo, Cancion c) {
+        if (nodo == null) { totalNodos++; return new Nodo(c); }
+        int cmp = c.compareTo(nodo.cancion);
+        if      (cmp < 0) nodo.izquierdo = insertarRec(nodo.izquierdo, c);
+        else if (cmp > 0) nodo.derecho   = insertarRec(nodo.derecho,   c);
+        else return nodo; // duplicado
         return balancear(nodo);
     }
 
-    // Buscar una cancion por nombre
+    // ── Búsqueda ───────────────────────────────────────────────────────────
 
     public Cancion buscar(String nombre) {
-
-    Nodo encontrado = buscarNodo(raiz, nombre); 
-    if (encontrado != null) {
-        return encontrado.cancion;
-    }
-    return null;
+        Nodo n = buscarRec(raiz, nombre);
+        return (n != null) ? n.cancion : null;
     }
 
-    private Nodo buscarNodo(Nodo nodo, String nombre) {
-    if (nodo == null) {
-        return null;
+    private Nodo buscarRec(Nodo n, String nombre) {
+        if (n == null) return null;
+        int cmp = nombre.compareToIgnoreCase(n.cancion.getNombre());
+        if      (cmp < 0) return buscarRec(n.izquierdo, nombre);
+        else if (cmp > 0) return buscarRec(n.derecho,   nombre);
+        else              return n;
     }
 
-    int resultado = nombre.compareToIgnoreCase(
-            nodo.cancion.getNombre());
-
-    if (resultado < 0) {
-        return buscarNodo(nodo.izquierdo, nombre);
-    }
-
-    if (resultado > 0) {
-        return buscarNodo(nodo.derecho, nombre);
-    }
-
-    return nodo;
-   }
-    
     public List<Cancion> buscarPorArtista(String artista) {
-
-    List<Cancion> cancionesEncontradas = new ArrayList<>();
-    buscarArtista(raiz, artista.toLowerCase(), cancionesEncontradas);
-
-    return cancionesEncontradas;
+        List<Cancion> r = new ArrayList<>();
+        buscarArtistaRec(raiz, artista.toLowerCase(), r);
+        return r;
     }
 
-    private void buscarArtista(Nodo nodo, String artista, List<Cancion> cancionesEncontradas) {
-
-    if (nodo == null) {
-        return;
-    }
-
-    if (nodo.cancion.getArtista().toLowerCase().contains(artista)) {
-        cancionesEncontradas.add(nodo.cancion);
-    }
-
-    buscarArtista(nodo.izquierdo, artista, cancionesEncontradas);
-    buscarArtista(nodo.derecho, artista, cancionesEncontradas);
+    private void buscarArtistaRec(Nodo n, String a, List<Cancion> r) {
+        if (n == null) return;
+        if (n.cancion.getArtista().toLowerCase().contains(a)) r.add(n.cancion);
+        buscarArtistaRec(n.izquierdo, a, r);
+        buscarArtistaRec(n.derecho, a, r);
     }
 
     public List<Cancion> buscarPorAlbum(String album) {
-
-    List<Cancion> cancionesEncontradas = new ArrayList<>();
-
-    buscarAlbum(raiz, album.toLowerCase(), cancionesEncontradas);
-
-    return cancionesEncontradas;
+        List<Cancion> r = new ArrayList<>();
+        buscarAlbumRec(raiz, album.toLowerCase(), r);
+        return r;
     }
 
-    private void buscarAlbum(Nodo nodo, String album, List<Cancion> cancionesEncontradas) {
-
-    if (nodo == null) {
-        return;
-    }
-
-    if (nodo.cancion.getAlbum().toLowerCase().contains(album)) {
-        cancionesEncontradas.add(nodo.cancion);
-    }
-
-    buscarAlbum(nodo.izquierdo, album, cancionesEncontradas);
-    buscarAlbum(nodo.derecho, album, cancionesEncontradas);
+    private void buscarAlbumRec(Nodo n, String al, List<Cancion> r) {
+        if (n == null) return;
+        if (n.cancion.getAlbum().toLowerCase().contains(al)) r.add(n.cancion);
+        buscarAlbumRec(n.izquierdo, al, r);
+        buscarAlbumRec(n.derecho, al, r);
     }
 
     public List<Cancion> buscarPorGenero(String genero) {
-
-    List<Cancion> cancionesEncontradas = new ArrayList<>();
-
-    buscarGenero(raiz, genero.toLowerCase(), cancionesEncontradas);
-
-    return cancionesEncontradas;
-    }
-    
-    private void buscarGenero(Nodo nodo, String genero, List<Cancion> cancionesEncontradas) {
-
-    if (nodo == null) {
-        return;
+        List<Cancion> r = new ArrayList<>();
+        buscarGeneroRec(raiz, genero.toLowerCase(), r);
+        return r;
     }
 
-    if (nodo.cancion.getGenero().toLowerCase().contains(genero)) {
-        cancionesEncontradas.add(nodo.cancion);
+    private void buscarGeneroRec(Nodo n, String g, List<Cancion> r) {
+        if (n == null) return;
+        if (n.cancion.getGenero().toLowerCase().contains(g)) r.add(n.cancion);
+        buscarGeneroRec(n.izquierdo, g, r);
+        buscarGeneroRec(n.derecho, g, r);
     }
 
-    buscarGenero(nodo.izquierdo, genero, cancionesEncontradas);
-    buscarGenero(nodo.derecho, genero, cancionesEncontradas);
+    // ── Modificación ───────────────────────────────────────────────────────
+
+    public boolean modificar(String nombre, Cancion nueva) {
+        Nodo n = buscarRec(raiz, nombre);
+        if (n == null) return false;
+        n.cancion = nueva;
+        return true;
     }
 
-    public boolean modificar(String nombre, Cancion nuevaCancion) {
-
-    Nodo encontrado = buscarNodo(raiz, nombre);
-
-    if (encontrado == null) {
-        return false;
-    }
-
-    encontrado.cancion = nuevaCancion;
-    return true;
-    }
+    // ── Eliminación ────────────────────────────────────────────────────────
 
     public boolean eliminar(String nombre) {
-
-    int cantidadAntes = totalNodos;
-    raiz = eliminarNodo(raiz, nombre);
-
-    return totalNodos < cantidadAntes;
+        int antes = totalNodos;
+        raiz = eliminarRec(raiz, nombre);
+        return totalNodos < antes;
     }
 
-    private Nodo eliminarNodo(Nodo nodo, String nombre) {
-
-    if (nodo == null) {
-        return null;
-    }
-
-    int resultado = nombre.compareToIgnoreCase(nodo.cancion.getNombre());
-
-    if (resultado < 0) {
-        nodo.izquierdo = eliminarNodo(nodo.izquierdo, nombre);
-    } else if (resultado > 0) {
-        nodo.derecho = eliminarNodo(nodo.derecho, nombre);
-    } else {
-        totalNodos--;
-
-        // Solo tiene hijo derecho
-        if (nodo.izquierdo == null) {
-            return nodo.derecho;
+    private Nodo eliminarRec(Nodo nodo, String nombre) {
+        if (nodo == null) return null;
+        int cmp = nombre.compareToIgnoreCase(nodo.cancion.getNombre());
+        if      (cmp < 0) nodo.izquierdo = eliminarRec(nodo.izquierdo, nombre);
+        else if (cmp > 0) nodo.derecho   = eliminarRec(nodo.derecho,   nombre);
+        else {
+            totalNodos--;
+            if (nodo.izquierdo == null) return nodo.derecho;
+            if (nodo.derecho   == null) return nodo.izquierdo;
+            Nodo sucesor = minimo(nodo.derecho);
+            nodo.cancion = sucesor.cancion;
+            nodo.derecho = eliminarRec(nodo.derecho, sucesor.cancion.getNombre());
         }
-
-        // Solo tiene hijo izquierdo
-        if (nodo.derecho == null) {
-            return nodo.izquierdo;
-        }
-
-        // Tiene dos hijos
-        Nodo reemplazo = obtenerMenor(nodo.derecho);
-        nodo.cancion = reemplazo.cancion;
-        nodo.derecho = eliminarNodo(
-                nodo.derecho,
-                reemplazo.cancion.getNombre()
-        );
+        return balancear(nodo);
     }
 
-    return balancear(nodo);
+    private Nodo minimo(Nodo n) {
+        while (n.izquierdo != null) n = n.izquierdo;
+        return n;
     }
 
-    private Nodo obtenerMenor(Nodo nodo) {
+    // ── Recorridos ─────────────────────────────────────────────────────────
 
-    while (nodo.izquierdo != null) {
-        nodo = nodo.izquierdo;
-    }
-
-    return nodo;
-    }
-    
     public List<Cancion> inOrden() {
-    List<Cancion> canciones = new ArrayList<>();
-    recorrerInOrden(raiz, canciones);
-
-    return canciones;
+        List<Cancion> l = new ArrayList<>(); inOrdenRec(raiz, l); return l;
     }
-
-    private void recorrerInOrden(Nodo nodo, List<Cancion> canciones) {
-
-    if (nodo == null) {
-        return;
-    }
-    recorrerInOrden(nodo.izquierdo, canciones);
-    canciones.add(nodo.cancion);
-    recorrerInOrden(nodo.derecho, canciones);
+    private void inOrdenRec(Nodo n, List<Cancion> l) {
+        if (n == null) return;
+        inOrdenRec(n.izquierdo, l); l.add(n.cancion); inOrdenRec(n.derecho, l);
     }
 
     public List<Cancion> preOrden() {
-
-    List<Cancion> canciones = new ArrayList<>();
-    recorrerPreOrden(raiz, canciones);
-
-    return canciones;
+        List<Cancion> l = new ArrayList<>(); preOrdenRec(raiz, l); return l;
     }
-
-    private void recorrerPreOrden(Nodo nodo, List<Cancion> canciones) {
-
-    if (nodo == null) {
-        return;
-    }
-    canciones.add(nodo.cancion);
-    recorrerPreOrden(nodo.izquierdo, canciones);
-    recorrerPreOrden(nodo.derecho, canciones);
+    private void preOrdenRec(Nodo n, List<Cancion> l) {
+        if (n == null) return;
+        l.add(n.cancion); preOrdenRec(n.izquierdo, l); preOrdenRec(n.derecho, l);
     }
 
     public List<Cancion> postOrden() {
-
-    List<Cancion> canciones = new ArrayList<>();
-    recorrerPostOrden(raiz, canciones);
-
-    return canciones;
+        List<Cancion> l = new ArrayList<>(); postOrdenRec(raiz, l); return l;
+    }
+    private void postOrdenRec(Nodo n, List<Cancion> l) {
+        if (n == null) return;
+        postOrdenRec(n.izquierdo, l); postOrdenRec(n.derecho, l); l.add(n.cancion);
     }
 
-    private void recorrerPostOrden(Nodo nodo, List<Cancion> canciones) {
+    // ── Utilidades ─────────────────────────────────────────────────────────
 
-    if (nodo == null) {
-        return;
-    }
-    recorrerPostOrden(nodo.izquierdo, canciones);
-    recorrerPostOrden(nodo.derecho, canciones);
-    canciones.add(nodo.cancion);
-    }
+    public int getTotalNodos() { return totalNodos; }
+    public boolean isEmpty()   { return raiz == null; }
+    public Nodo getRaiz()      { return raiz; }
 
-    public int getTotalNodos() {
-    return totalNodos;
-    }
-
-    public boolean estaVacio() {
-    return raiz == null;
-    }
-
-    public Nodo getRaiz() {
-    return raiz;
-    }
-
-    public int getAltura() {
-    return altura(raiz);
-    }
-
-    public int getFactorBalanceRaiz() {
-    return factorBalance(raiz);
-    }
+    public int altura()            { return altura(raiz); }
+    public int factorBalanceRaiz() { return factorBalance(raiz); }
 }
+    
