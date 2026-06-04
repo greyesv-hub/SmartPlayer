@@ -131,79 +131,144 @@ public class ArbolAVL {
         return new Nodo(c);
     }
 
-    int comparacion = c.compareTo(nodo.cancion);
-
-    if (comparacion < 0) {
-
-        nodo.izquierdo = insertarRec(
-                nodo.izquierdo,
-                c
-        );
-
-    } else if (comparacion > 0) {
-
+    int comp = c.compareTo(nodo.cancion);
+    if (comp < 0) {
+        nodo.izquierdo = insertarRec(nodo.izquierdo,c);
+    } else if (comp > 0) {
         nodo.derecho = insertarRec(nodo.derecho,c);
     } else {
-
         return nodo;
     }
-
     return balancear(nodo);
-}
-
-    // ── Búsqueda ───────────────────────────────────────────────────────────
-
-    public Cancion buscar(String nombre) {
-        Nodo n = buscarRec(raiz, nombre);
-        return (n != null) ? n.cancion : null;
     }
 
-    private Nodo buscarRec(Nodo n, String nombre) {
-        if (n == null) return null;
-        int cmp = nombre.compareToIgnoreCase(n.cancion.getNombre());
-        if      (cmp < 0) return buscarRec(n.izquierdo, nombre);
-        else if (cmp > 0) return buscarRec(n.derecho,   nombre);
-        else              return n;
+    public Cancion buscar(String nombre) {
+       Nodo encontrado = buscarRec(raiz, nombre);
+
+       if (encontrado != null) {
+        return encontrado.cancion;
+    }
+    return null;
+    }
+
+    private Nodo buscarRec(Nodo nodo, String nombre) {
+
+       if (nodo == null) {
+        return null;
+    }
+
+    int resultado = nombre.compareToIgnoreCase(nodo.cancion.getNombre());
+
+    if (resultado < 0) {
+        return buscarRec(nodo.izquierdo, nombre);
+    }
+
+    if (resultado > 0) {
+        return buscarRec(nodo.derecho, nombre);
+    }
+    return nodo;
     }
 
     public List<Cancion> buscarPorArtista(String artista) {
-        List<Cancion> r = new ArrayList<>();
-        buscarArtistaRec(raiz, artista.toLowerCase(), r);
-        return r;
+
+    List<Cancion> cancionesEncontradas = new ArrayList<>();
+    buscarArtistaRec(raiz, artista.toLowerCase(), cancionesEncontradas);
+
+    return cancionesEncontradas;
     }
 
-    private void buscarArtistaRec(Nodo n, String a, List<Cancion> r) {
-        if (n == null) return;
-        if (n.cancion.getArtista().toLowerCase().contains(a)) r.add(n.cancion);
-        buscarArtistaRec(n.izquierdo, a, r);
-        buscarArtistaRec(n.derecho, a, r);
+    private void buscarArtistaRec(Nodo nodo,String artista,List<Cancion> cancionesEncontradas) {
+
+       if (nodo == null) {
+        return;
+    }
+
+       if (nodo.cancion.getArtista().toLowerCase().contains(artista)) {
+        cancionesEncontradas.add(nodo.cancion);
+    }
+
+    buscarArtistaRec(nodo.izquierdo, artista, cancionesEncontradas);
+    buscarArtistaRec(nodo.derecho, artista, cancionesEncontradas);
     }
 
     public List<Cancion> buscarPorAlbum(String album) {
-        List<Cancion> r = new ArrayList<>();
-        buscarAlbumRec(raiz, album.toLowerCase(), r);
-        return r;
+
+       List<Cancion> cancionesEncontradas = new ArrayList<>();
+       buscarAlbumRec(raiz, album.toLowerCase(), cancionesEncontradas);
+
+      return cancionesEncontradas;
     }
 
-    private void buscarAlbumRec(Nodo n, String al, List<Cancion> r) {
-        if (n == null) return;
-        if (n.cancion.getAlbum().toLowerCase().contains(al)) r.add(n.cancion);
-        buscarAlbumRec(n.izquierdo, al, r);
-        buscarAlbumRec(n.derecho, al, r);
+private void buscarAlbumRec(
+        Nodo nodo,
+        String album,
+        List<Cancion> cancionesEncontradas) {
+
+    if (nodo == null) {
+        return;
     }
 
-    public List<Cancion> buscarPorGenero(String genero) {
-        List<Cancion> r = new ArrayList<>();
-        buscarGeneroRec(raiz, genero.toLowerCase(), r);
-        return r;
+    if (nodo.cancion.getAlbum()
+            .toLowerCase()
+            .contains(album)) {
+
+        cancionesEncontradas.add(nodo.cancion);
     }
 
-    private void buscarGeneroRec(Nodo n, String g, List<Cancion> r) {
-        if (n == null) return;
-        if (n.cancion.getGenero().toLowerCase().contains(g)) r.add(n.cancion);
-        buscarGeneroRec(n.izquierdo, g, r);
-        buscarGeneroRec(n.derecho, g, r);
+    buscarAlbumRec(
+            nodo.izquierdo,
+            album,
+            cancionesEncontradas
+    );
+
+    buscarAlbumRec(
+            nodo.derecho,
+            album,
+            cancionesEncontradas
+    );
+}
+
+public List<Cancion> buscarPorGenero(String genero) {
+
+    List<Cancion> cancionesEncontradas = new ArrayList<>();
+
+    buscarGeneroRec(
+            raiz,
+            genero.toLowerCase(),
+            cancionesEncontradas
+    );
+
+    return cancionesEncontradas;
+}
+
+private void buscarGeneroRec(
+        Nodo nodo,
+        String genero,
+        List<Cancion> cancionesEncontradas) {
+
+    if (nodo == null) {
+        return;
     }
+
+    if (nodo.cancion.getGenero()
+            .toLowerCase()
+            .contains(genero)) {
+
+        cancionesEncontradas.add(nodo.cancion);
+    }
+
+    buscarGeneroRec(
+            nodo.izquierdo,
+            genero,
+            cancionesEncontradas
+    );
+
+    buscarGeneroRec(
+            nodo.derecho,
+            genero,
+            cancionesEncontradas
+    );
+}
 
     // ── Modificación ───────────────────────────────────────────────────────
 
