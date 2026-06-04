@@ -14,64 +14,89 @@ import smartplayer.model.Cancion;
  */
 public class ArbolAVL {
 
-    // ── Nodo interno ───────────────────────────────────────────────────────
     public static class Nodo {
-        public Cancion cancion;
-        public Nodo izquierdo;
-        public Nodo derecho;
-        public int altura;
-        Nodo(Cancion c) { this.cancion = c; this.altura = 1; }
+
+    public Cancion cancion;
+    public Nodo izquierdo;
+    public Nodo derecho;
+    public int altura;
+
+    Nodo(Cancion c) {
+        cancion = c;
+        altura = 1;
+       }
     }
 
     private Nodo raiz;
-    private int  totalNodos;
+    private int totalNodos;
 
-    // ── Altura y factor de balance ─────────────────────────────────────────
+    private int altura(Nodo n) {
+    if (n == null) {
+        return 0;
+    }
 
-    private int altura(Nodo n)       { return (n == null) ? 0 : n.altura; }
+    return n.altura;
+}
 
     private void actualizarAltura(Nodo n) {
-        n.altura = 1 + Math.max(altura(n.izquierdo), altura(n.derecho));
+    int alturaIzquierda = altura(n.izquierdo);
+    int alturaDerecha = altura(n.derecho);
+
+    if (alturaIzquierda > alturaDerecha) {
+        n.altura = alturaIzquierda + 1;
+    } else {
+        n.altura = alturaDerecha + 1;
     }
+     }
 
     private int factorBalance(Nodo n) {
-        return (n == null) ? 0 : altura(n.izquierdo) - altura(n.derecho);
+    if (n == null) {
+        return 0;
     }
 
-      // ── Rotaciones ─────────────────────────────────────────────────────────
+    return altura(n.izquierdo) - altura(n.derecho);
+    }
 
-    /** Rotación Simple Derecha (RD) */
     private Nodo rotacionDerecha(Nodo y) {
-        Nodo x  = y.izquierdo;
-        Nodo T2 = x.derecho;
-        x.derecho   = y;
-        y.izquierdo = T2;
-        actualizarAltura(y);
-        actualizarAltura(x);
-        return x;
+    Nodo x = y.izquierdo;
+    Nodo T2 = x.derecho;
+
+    x.derecho = y;
+    y.izquierdo = T2;
+
+    actualizarAltura(y);
+    actualizarAltura(x);
+
+    return x;
     }
 
-    /** Rotación Simple Izquierda (RI) */
     private Nodo rotacionIzquierda(Nodo x) {
-        Nodo y  = x.derecho;
-        Nodo T2 = y.izquierdo;
-        y.izquierdo = x;
-        x.derecho   = T2;
-        actualizarAltura(x);
-        actualizarAltura(y);
-        return y;
+    Nodo y = x.derecho;
+    Nodo T2 = y.izquierdo;
+
+    y.izquierdo = x;
+    x.derecho = T2;
+
+    actualizarAltura(x);
+    actualizarAltura(y);
+
+    return y;
     }
 
-    /** Rotación Doble Izquierda-Derecha (RID) */
     private Nodo rotacionIzquierdaDerecha(Nodo n) {
-        n.izquierdo = rotacionIzquierda(n.izquierdo);
-        return rotacionDerecha(n);
+
+    Nodo hijoIzquierdo = n.izquierdo;
+    n.izquierdo = rotacionIzquierda(hijoIzquierdo);
+
+    return rotacionDerecha(n);
     }
 
-    /** Rotación Doble Derecha-Izquierda (RDI) */
     private Nodo rotacionDerechaIzquierda(Nodo n) {
-        n.derecho = rotacionDerecha(n.derecho);
-        return rotacionIzquierda(n);
+
+    Nodo hijoDerecho = n.derecho;
+    n.derecho = rotacionDerecha(hijoDerecho);
+
+    return rotacionIzquierda(n);
     }
 
       /** Aplica la rotación correcta según el factor de balance */
