@@ -226,17 +226,30 @@ public class ArbolBinarioBusqueda {
         lista.add(n.cancion);
     }
 
-    // ── Utilidades ─────────────────────────────────────────────────────────
-
-    public int getTotalNodos() { return totalNodos; }
-    public boolean isEmpty()   { return raiz == null; }
-    public Nodo getRaiz()      { return raiz; }
-
-    public int altura() { return alturaRec(raiz); }
-
-    private int alturaRec(Nodo n) {
-        if (n == null) return 0;
-        return 1 + Math.max(alturaRec(n.izquierdo), alturaRec(n.derecho));
+    public int getTotalNodos() {
+    return totalNodos;
     }
+
+    public boolean isEmpty() {
+    return raiz == null;
+   }
+
+   public Nodo getRaiz() {
+    return raiz;
+   }
+
+   public int altura() {
+    return alturaRec(raiz);
+   }
+
+   private int alturaRec(Nodo nodo) {
+
+    if (nodo == null) {
+        return 0;
+    }
+
+    return 1 + Math.max(alturaRec(nodo.izquierdo), alturaRec(nodo.derecho)
+    );
+  }
 }
     
