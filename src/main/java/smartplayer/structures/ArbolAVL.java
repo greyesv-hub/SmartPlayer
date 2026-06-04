@@ -119,115 +119,112 @@ public class ArbolAVL {
             return rotacionDerechaIzquierda(nodo);
 
         return nodo; // ya balanceado
-    }
-
-    public void insertar(Cancion c) {
-        raiz = insertarRec(raiz, c);
-    }
-
-    private Nodo insertarRec(Nodo nodo, Cancion c) {
-        if (nodo == null) {
-        totalNodos++;
-        return new Nodo(c);
-    }
-
-    int comp = c.compareTo(nodo.cancion);
-    if (comp < 0) {
-        nodo.izquierdo = insertarRec(nodo.izquierdo,c);
-    } else if (comp > 0) {
-        nodo.derecho = insertarRec(nodo.derecho,c);
-    } else {
-        return nodo;
-    }
-    return balancear(nodo);
-    }
-
-    public Cancion buscar(String nombre) {
-       Nodo encontrado = buscarRec(raiz, nombre);
-
-       if (encontrado != null) {
-        return encontrado.cancion;
-    }
-    return null;
-    }
-
-    private Nodo buscarRec(Nodo nodo, String nombre) {
-
-       if (nodo == null) {
-        return null;
-    }
-
-    int resultado = nombre.compareToIgnoreCase(nodo.cancion.getNombre());
-
-    if (resultado < 0) {
-        return buscarRec(nodo.izquierdo, nombre);
-    }
-
-    if (resultado > 0) {
-        return buscarRec(nodo.derecho, nombre);
-    }
-    return nodo;
-    }
-
-    public List<Cancion> buscarPorArtista(String artista) {
-
-    List<Cancion> cancionesEncontradas = new ArrayList<>();
-    buscarArtistaRec(raiz, artista.toLowerCase(), cancionesEncontradas);
-
-    return cancionesEncontradas;
-    }
-
-    private void buscarArtistaRec(Nodo nodo,String artista,List<Cancion> cancionesEncontradas) {
-
-       if (nodo == null) {
-        return;
-    }
-
-       if (nodo.cancion.getArtista().toLowerCase().contains(artista)) {
-        cancionesEncontradas.add(nodo.cancion);
-    }
-
-    buscarArtistaRec(nodo.izquierdo, artista, cancionesEncontradas);
-    buscarArtistaRec(nodo.derecho, artista, cancionesEncontradas);
         }
 
-        public List<Cancion> buscarPorAlbum(String album) {
+        public void insertar(Cancion c) {
+         raiz = insertarRec(raiz, c);
+        }
+
+         private Nodo insertarRec(Nodo nodo, Cancion c) {
+         if (nodo == null) {
+         totalNodos++;
+         return new Nodo(c);
+        }
+
+        int comp = c.compareTo(nodo.cancion);
+         if (comp < 0) {
+         nodo.izquierdo = insertarRec(nodo.izquierdo,c);
+         }else if (comp > 0) {
+         nodo.derecho = insertarRec(nodo.derecho,c);
+         }else{
+         return nodo;
+        }
+         return balancear(nodo);
+    }
+
+         public Cancion buscar(String nombre) {
+          Nodo encontrado = buscarRec(raiz, nombre);
+
+        if (encontrado != null) {
+         return encontrado.cancion;
+        }
+         return null;
+    }
+
+          private Nodo buscarRec(Nodo nodo, String nombre) {
+
+          if (nodo == null) {
+          return null;
+    }
+
+          int resultado = nombre.compareToIgnoreCase(nodo.cancion.getNombre());
+
+          if (resultado < 0) {
+          return buscarRec(nodo.izquierdo, nombre);
+          }
+          if (resultado > 0) {
+          return buscarRec(nodo.derecho, nombre);
+        }
+          return nodo;
+    }
+
+          public List<Cancion> buscarPorArtista(String artista) {List<Cancion> cancionesEncontradas = new ArrayList<>();
+          buscarArtistaRec(raiz, artista.toLowerCase(), cancionesEncontradas);
+
+          return cancionesEncontradas;
+        }
+
+          private void buscarArtistaRec(Nodo nodo,String artista,List<Cancion> cancionesEncontradas) {
+
+          if (nodo == null) {
+          return;
+        }
+
+          if (nodo.cancion.getArtista().toLowerCase().contains(artista)) {
+          cancionesEncontradas.add(nodo.cancion);
+    }
+
+          buscarArtistaRec(nodo.izquierdo, artista, cancionesEncontradas);
+          buscarArtistaRec(nodo.derecho, artista, cancionesEncontradas);
+        }
+
+         public List<Cancion> buscarPorAlbum(String album) {
 
          List<Cancion> cancionesEncontradas = new ArrayList<>();
          buscarAlbumRec(raiz, album.toLowerCase(), cancionesEncontradas);
 
          return cancionesEncontradas;
-    }
+        }
 
-        private void buscarAlbumRec(Nodo nodo, String album, List<Cancion> cancionesEncontradas) {
+         private void buscarAlbumRec(Nodo nodo, String album, List<Cancion> cancionesEncontradas) {
 
-        if (nodo == null) {
+         if (nodo == null) {
          return;
     }
 
-        if (nodo.cancion.getAlbum().toLowerCase().contains(album)) {
+         if (nodo.cancion.getAlbum().toLowerCase().contains(album)) {
          cancionesEncontradas.add(nodo.cancion);
-      }
+        }
 
-        buscarAlbumRec(nodo.izquierdo, album, cancionesEncontradas);
-        buscarAlbumRec(nodo.derecho, album, cancionesEncontradas);
+         buscarAlbumRec(nodo.izquierdo, album, cancionesEncontradas);
+         buscarAlbumRec(nodo.derecho, album, cancionesEncontradas);
     }
 
-        public List<Cancion> buscarPorGenero(String genero) {List<Cancion> cancionesEncontradas = new ArrayList<>();
+         public List<Cancion> buscarPorGenero(String genero) {List<Cancion> cancionesEncontradas = new ArrayList<>();
 
-        buscarGeneroRec(raiz, genero.toLowerCase(), cancionesEncontradas);
+         buscarGeneroRec(raiz, genero.toLowerCase(), cancionesEncontradas);
  
-        return cancionesEncontradas;
-      }
+         return cancionesEncontradas;
+        }
 
          private void buscarGeneroRec(Nodo nodo, String genero, List<Cancion> cancionesEncontradas) {
 
          if (nodo == null) {
          return;
-       }
+        }
 
          if (nodo.cancion.getGenero().toLowerCase().contains(genero)) {cancionesEncontradas.add(nodo.cancion);
-      }
+        }
 
          buscarGeneroRec(nodo.izquierdo, genero, cancionesEncontradas);
          buscarGeneroRec(nodo.derecho, genero, cancionesEncontradas);
@@ -240,7 +237,7 @@ public class ArbolAVL {
 
          if (encontrado == null) {
           return false;
-      }
+        }
 
          encontrado.cancion = nueva;
          return true;
@@ -342,26 +339,24 @@ public class ArbolAVL {
          lista.add(nodo.cancion);
     }
 
-// ── Utilidades ─────────────────────────────────────────────────────────
+        public int getTotalNodos() {
+        return totalNodos;
+    }
 
-public int getTotalNodos() {
-    return totalNodos;
-}
+        public boolean isEmpty() {
+        return raiz == null;
+    }
 
-public boolean isEmpty() {
-    return raiz == null;
-}
+        public Nodo getRaiz() {
+        return raiz;
+    }
 
-public Nodo getRaiz() {
-    return raiz;
-}
+        public int altura() {
+        return altura(raiz);
+    }
 
-public int altura() {
-    return altura(raiz);
-}
-
-public int factorBalanceRaiz() {
-    return factorBalance(raiz);
-} 
+        public int factorBalanceRaiz() {
+        return factorBalance(raiz);
+   } 
 }
     
