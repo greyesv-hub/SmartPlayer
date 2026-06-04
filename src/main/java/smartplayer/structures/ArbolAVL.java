@@ -189,158 +189,179 @@ public class ArbolAVL {
 
     buscarArtistaRec(nodo.izquierdo, artista, cancionesEncontradas);
     buscarArtistaRec(nodo.derecho, artista, cancionesEncontradas);
-    }
-
-    public List<Cancion> buscarPorAlbum(String album) {
-
-       List<Cancion> cancionesEncontradas = new ArrayList<>();
-       buscarAlbumRec(raiz, album.toLowerCase(), cancionesEncontradas);
-
-      return cancionesEncontradas;
-    }
-
-private void buscarAlbumRec(
-        Nodo nodo,
-        String album,
-        List<Cancion> cancionesEncontradas) {
-
-    if (nodo == null) {
-        return;
-    }
-
-    if (nodo.cancion.getAlbum()
-            .toLowerCase()
-            .contains(album)) {
-
-        cancionesEncontradas.add(nodo.cancion);
-    }
-
-    buscarAlbumRec(
-            nodo.izquierdo,
-            album,
-            cancionesEncontradas
-    );
-
-    buscarAlbumRec(
-            nodo.derecho,
-            album,
-            cancionesEncontradas
-    );
-}
-
-public List<Cancion> buscarPorGenero(String genero) {
-
-    List<Cancion> cancionesEncontradas = new ArrayList<>();
-
-    buscarGeneroRec(
-            raiz,
-            genero.toLowerCase(),
-            cancionesEncontradas
-    );
-
-    return cancionesEncontradas;
-}
-
-private void buscarGeneroRec(
-        Nodo nodo,
-        String genero,
-        List<Cancion> cancionesEncontradas) {
-
-    if (nodo == null) {
-        return;
-    }
-
-    if (nodo.cancion.getGenero()
-            .toLowerCase()
-            .contains(genero)) {
-
-        cancionesEncontradas.add(nodo.cancion);
-    }
-
-    buscarGeneroRec(
-            nodo.izquierdo,
-            genero,
-            cancionesEncontradas
-    );
-
-    buscarGeneroRec(
-            nodo.derecho,
-            genero,
-            cancionesEncontradas
-    );
-}
-
-    // ── Modificación ───────────────────────────────────────────────────────
-
-    public boolean modificar(String nombre, Cancion nueva) {
-        Nodo n = buscarRec(raiz, nombre);
-        if (n == null) return false;
-        n.cancion = nueva;
-        return true;
-    }
-
-    // ── Eliminación ────────────────────────────────────────────────────────
-
-    public boolean eliminar(String nombre) {
-        int antes = totalNodos;
-        raiz = eliminarRec(raiz, nombre);
-        return totalNodos < antes;
-    }
-
-    private Nodo eliminarRec(Nodo nodo, String nombre) {
-        if (nodo == null) return null;
-        int cmp = nombre.compareToIgnoreCase(nodo.cancion.getNombre());
-        if      (cmp < 0) nodo.izquierdo = eliminarRec(nodo.izquierdo, nombre);
-        else if (cmp > 0) nodo.derecho   = eliminarRec(nodo.derecho,   nombre);
-        else {
-            totalNodos--;
-            if (nodo.izquierdo == null) return nodo.derecho;
-            if (nodo.derecho   == null) return nodo.izquierdo;
-            Nodo sucesor = minimo(nodo.derecho);
-            nodo.cancion = sucesor.cancion;
-            nodo.derecho = eliminarRec(nodo.derecho, sucesor.cancion.getNombre());
         }
-        return balancear(nodo);
+
+        public List<Cancion> buscarPorAlbum(String album) {
+
+         List<Cancion> cancionesEncontradas = new ArrayList<>();
+         buscarAlbumRec(raiz, album.toLowerCase(), cancionesEncontradas);
+
+         return cancionesEncontradas;
     }
 
-    private Nodo minimo(Nodo n) {
-        while (n.izquierdo != null) n = n.izquierdo;
-        return n;
+        private void buscarAlbumRec(Nodo nodo, String album, List<Cancion> cancionesEncontradas) {
+
+        if (nodo == null) {
+         return;
     }
 
-    // ── Recorridos ─────────────────────────────────────────────────────────
+        if (nodo.cancion.getAlbum().toLowerCase().contains(album)) {
+         cancionesEncontradas.add(nodo.cancion);
+      }
 
-    public List<Cancion> inOrden() {
-        List<Cancion> l = new ArrayList<>(); inOrdenRec(raiz, l); return l;
-    }
-    private void inOrdenRec(Nodo n, List<Cancion> l) {
-        if (n == null) return;
-        inOrdenRec(n.izquierdo, l); l.add(n.cancion); inOrdenRec(n.derecho, l);
+        buscarAlbumRec(nodo.izquierdo, album, cancionesEncontradas);
+        buscarAlbumRec(nodo.derecho, album, cancionesEncontradas);
     }
 
-    public List<Cancion> preOrden() {
-        List<Cancion> l = new ArrayList<>(); preOrdenRec(raiz, l); return l;
-    }
-    private void preOrdenRec(Nodo n, List<Cancion> l) {
-        if (n == null) return;
-        l.add(n.cancion); preOrdenRec(n.izquierdo, l); preOrdenRec(n.derecho, l);
+        public List<Cancion> buscarPorGenero(String genero) {List<Cancion> cancionesEncontradas = new ArrayList<>();
+
+        buscarGeneroRec(raiz, genero.toLowerCase(), cancionesEncontradas);
+ 
+        return cancionesEncontradas;
+      }
+
+         private void buscarGeneroRec(Nodo nodo, String genero, List<Cancion> cancionesEncontradas) {
+
+         if (nodo == null) {
+         return;
+       }
+
+         if (nodo.cancion.getGenero().toLowerCase().contains(genero)) {cancionesEncontradas.add(nodo.cancion);
+      }
+
+         buscarGeneroRec(nodo.izquierdo, genero, cancionesEncontradas);
+         buscarGeneroRec(nodo.derecho, genero, cancionesEncontradas);
     }
 
-    public List<Cancion> postOrden() {
-        List<Cancion> l = new ArrayList<>(); postOrdenRec(raiz, l); return l;
+
+         public boolean modificar(String nombre, Cancion nueva) {
+
+         Nodo encontrado = buscarRec(raiz, nombre);
+
+         if (encontrado == null) {
+          return false;
+      }
+
+         encontrado.cancion = nueva;
+         return true;
     }
-    private void postOrdenRec(Nodo n, List<Cancion> l) {
-        if (n == null) return;
-        postOrdenRec(n.izquierdo, l); postOrdenRec(n.derecho, l); l.add(n.cancion);
+ 
+         public boolean eliminar(String nombre) {
+
+         int cantidadAntes = totalNodos;
+         raiz = eliminarRec(raiz, nombre);
+
+         return totalNodos < cantidadAntes;
     }
 
-    // ── Utilidades ─────────────────────────────────────────────────────────
+         private Nodo eliminarRec(Nodo nodo, String nombre) {
 
-    public int getTotalNodos() { return totalNodos; }
-    public boolean isEmpty()   { return raiz == null; }
-    public Nodo getRaiz()      { return raiz; }
+         if (nodo == null) {
+         return null;
+    }
 
-    public int altura()            { return altura(raiz); }
-    public int factorBalanceRaiz() { return factorBalance(raiz); }
+         int resultado = nombre.compareToIgnoreCase(nodo.cancion.getNombre());
+
+         if (resultado < 0) {
+         nodo.izquierdo = eliminarRec(nodo.izquierdo,nombre);
+         }else if (resultado > 0) {
+         nodo.derecho = eliminarRec(nodo.derecho,nombre);
+         }else{
+         totalNodos--;
+
+         // Solo tiene hijo derecho
+         if (nodo.izquierdo == null) {
+            return nodo.derecho;
+        }
+
+         // Solo tiene hijo izquierdo
+         if (nodo.derecho == null) {
+            return nodo.izquierdo;
+        }
+
+         // Tiene dos hijos
+         Nodo sucesor = minimo(nodo.derecho);
+         nodo.cancion = sucesor.cancion;
+         nodo.derecho = eliminarRec(nodo.derecho,sucesor.cancion.getNombre());
+        }
+
+         return balancear(nodo);
+    }
+
+         private Nodo minimo(Nodo n) {
+            while (n.izquierdo != null)
+              n = n.izquierdo;
+          return n;
+    }
+
+         public List<Cancion> inOrden() {List<Cancion> lista = new ArrayList<>();
+
+         inOrdenRec(raiz, lista);
+         return lista;
+    }
+
+         private void inOrdenRec(Nodo nodo, List<Cancion> lista) {
+ 
+         if (nodo == null) {
+         return;
+    }
+         inOrdenRec(nodo.izquierdo, lista);
+         lista.add(nodo.cancion);
+         inOrdenRec(nodo.derecho, lista);
+    }
+
+         public List<Cancion> preOrden() {List<Cancion> lista = new ArrayList<>();
+
+         preOrdenRec(raiz, lista);
+         return lista;
+    }
+
+         private void preOrdenRec(Nodo nodo, List<Cancion> lista) {
+
+         if (nodo == null) {
+         return;
+    }
+         lista.add(nodo.cancion);
+         preOrdenRec(nodo.izquierdo, lista);
+         preOrdenRec(nodo.derecho, lista);
+    }
+
+         public List<Cancion> postOrden() {List<Cancion> lista = new ArrayList<>();
+
+         postOrdenRec(raiz, lista);
+         return lista;
+    }
+
+         private void postOrdenRec(Nodo nodo, List<Cancion> lista) {
+
+         if (nodo == null) {
+         return;
+    }
+         postOrdenRec(nodo.izquierdo, lista);
+         postOrdenRec(nodo.derecho, lista);
+         lista.add(nodo.cancion);
+    }
+
+// ── Utilidades ─────────────────────────────────────────────────────────
+
+public int getTotalNodos() {
+    return totalNodos;
+}
+
+public boolean isEmpty() {
+    return raiz == null;
+}
+
+public Nodo getRaiz() {
+    return raiz;
+}
+
+public int altura() {
+    return altura(raiz);
+}
+
+public int factorBalanceRaiz() {
+    return factorBalance(raiz);
+} 
 }
     
