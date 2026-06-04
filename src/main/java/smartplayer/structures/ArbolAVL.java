@@ -99,9 +99,7 @@ public class ArbolAVL {
     return rotacionIzquierda(n);
     }
 
-      /** Aplica la rotación correcta según el factor de balance */
-    private Nodo balancear(Nodo nodo) {
-        actualizarAltura(nodo);
+    private Nodo balancear(Nodo nodo) {actualizarAltura(nodo);
         int fb = factorBalance(nodo);
 
         // Caso izquierda-izquierda → RD
@@ -123,20 +121,35 @@ public class ArbolAVL {
         return nodo; // ya balanceado
     }
 
-    // ── Inserción ──────────────────────────────────────────────────────────
-
     public void insertar(Cancion c) {
         raiz = insertarRec(raiz, c);
     }
 
     private Nodo insertarRec(Nodo nodo, Cancion c) {
-        if (nodo == null) { totalNodos++; return new Nodo(c); }
-        int cmp = c.compareTo(nodo.cancion);
-        if      (cmp < 0) nodo.izquierdo = insertarRec(nodo.izquierdo, c);
-        else if (cmp > 0) nodo.derecho   = insertarRec(nodo.derecho,   c);
-        else return nodo; // duplicado
-        return balancear(nodo);
+        if (nodo == null) {
+        totalNodos++;
+        return new Nodo(c);
     }
+
+    int comparacion = c.compareTo(nodo.cancion);
+
+    if (comparacion < 0) {
+
+        nodo.izquierdo = insertarRec(
+                nodo.izquierdo,
+                c
+        );
+
+    } else if (comparacion > 0) {
+
+        nodo.derecho = insertarRec(nodo.derecho,c);
+    } else {
+
+        return nodo;
+    }
+
+    return balancear(nodo);
+}
 
     // ── Búsqueda ───────────────────────────────────────────────────────────
 
