@@ -131,44 +131,61 @@ public class ArbolBinarioBusqueda {
 }
 
     public boolean modificar(String nombre, Cancion nueva) {
-        Nodo n = buscarRec(raiz, nombre);
-        if (n == null) return false;
-        n.cancion = nueva;
-        return true;
-    }
 
-    // ── Eliminación ────────────────────────────────────────────────────────
+    Nodo encontrado = buscarRec(raiz, nombre);
+    if (encontrado == null) {
+        return false;
+    }
+    encontrado.cancion = nueva;
+    return true;
+}
 
     public boolean eliminar(String nombre) {
-        int[] contador = {0};
-        raiz = eliminarRec(raiz, nombre, contador);
-        return contador[0] > 0;
+
+    int[] contador = {0};
+    raiz = eliminarRec(raiz, nombre, contador);
+    return contador[0] > 0;
+}
+
+    private Nodo eliminarRec(Nodo nodo, String nombre, int[] contador) {
+
+    if (nodo == null) {
+        return null;
     }
 
-    private Nodo eliminarRec(Nodo nodo, String nombre, int[] cont) {
-        if (nodo == null) return null;
-        int cmp = nombre.compareToIgnoreCase(nodo.cancion.getNombre());
-        if (cmp < 0) nodo.izquierdo = eliminarRec(nodo.izquierdo, nombre, cont);
-        else if (cmp > 0) nodo.derecho = eliminarRec(nodo.derecho, nombre, cont);
-        else {
-            cont[0]++;
-            totalNodos--;
-            if (nodo.izquierdo == null) return nodo.derecho;
-            if (nodo.derecho   == null) return nodo.izquierdo;
-            // Sucesor inorden (mínimo del subárbol derecho)
-            Nodo sucesor = minimo(nodo.derecho);
-            nodo.cancion = sucesor.cancion;
-            nodo.derecho = eliminarRec(nodo.derecho, sucesor.cancion.getNombre(), new int[]{0});
+    int resultado = nombre.compareToIgnoreCase(nodo.cancion.getNombre());
+
+    if (resultado < 0) {
+        nodo.izquierdo = eliminarRec(nodo.izquierdo, nombre, contador);
+    }else if (resultado > 0) {
+        nodo.derecho = eliminarRec(nodo.derecho, nombre, contador);
+    }else{
+        contador[0]++;
+        totalNodos--;
+
+        // Solo tiene hijo derecho
+        if (nodo.izquierdo == null) {
+            return nodo.derecho;
         }
-        return nodo;
+
+        // Solo tiene hijo izquierdo
+        if (nodo.derecho == null) {
+            return nodo.izquierdo;
+        }
+
+        // Tiene dos hijos
+        Nodo sucesor = minimo(nodo.derecho);
+        nodo.cancion = sucesor.cancion;
+        nodo.derecho = eliminarRec(nodo.derecho, sucesor.cancion.getNombre(), new int[]{0});
     }
+    return nodo;
+}
 
     private Nodo minimo(Nodo n) {
-        while (n.izquierdo != null) n = n.izquierdo;
+        while (n.izquierdo != null) 
+            n = n.izquierdo;
         return n;
     }
-
-    // ── Recorridos ─────────────────────────────────────────────────────────
 
     public List<Cancion> inOrden() {
         List<Cancion> lista = new ArrayList<>();
