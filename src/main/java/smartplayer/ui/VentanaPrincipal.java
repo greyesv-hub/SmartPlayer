@@ -2,6 +2,9 @@ package smartplayer.ui;
 
 import smartplayer.model.Cancion;
 import smartplayer.player.*;
+import smartplayer.model.Playlist;
+import smartplayer.structures.ArbolAVL;
+import smartplayer.structures.ArbolBinarioBusqueda; 
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -522,65 +525,31 @@ public class VentanaPrincipal extends JFrame {
     private void accionBuscar() {
 
         String termino = txtBuscar.getText().trim();
-        if (termino.isEmpty()) {
-            refrescarTablaBiblioteca(null);
-            return;
-        }
-
+        if (termino.isEmpty()) { refrescarTablaBiblioteca(null); return; }
         String criterio = (String) comboBuscarPor.getSelectedItem();
         List<Cancion> resultado;
-
         switch (criterio) {
-
-            case "Artista":
-
-                resultado = biblioteca.listaBiblioteca.buscarTodos(
-                        c -> c.getArtista().toLowerCase()
-                                .contains(termino.toLowerCase())
-                ).toList();
-                break;
-
-            case "Album":
-
-                resultado = biblioteca.listaBiblioteca.buscarTodos(
-                        c -> c.getAlbum().toLowerCase()
-                                .contains(termino.toLowerCase())).toList();
-                break;
-
-            case "Genero":
-
-                resultado = biblioteca.listaBiblioteca.buscarTodos(
-                        c -> c.getGenero().toLowerCase()
-                                .contains(termino.toLowerCase())).toList();
-                break;
-
+            case "Artista": resultado = biblioteca.getAbb().buscarPorArtista(termino); break;
+            case "Álbum":   resultado = biblioteca.getAbb().buscarPorAlbum(termino);   break;
+            case "Género":  resultado = biblioteca.getAbb().buscarPorGenero(termino);  break;
             default: {
-
-                Cancion c = biblioteca.listaBiblioteca.buscar(
-                        cancion -> cancion.getNombre().toLowerCase()
-                                .contains(termino.toLowerCase())
-                );
-
+                Cancion c = biblioteca.getAbb().buscar(termino);
                 resultado = c != null ? List.of(c) : List.of();
             }
         }
-
         refrescarTablaBiblioteca(resultado);
     }
 
     private void accionReproducirSeleccionada() {
         int fila = tablaBiblioteca.getSelectedRow();
-        if (fila < 0) {
-            return;
-        }
+        if (fila < 0) return;
         String nombre = (String) modeloBiblioteca.getValueAt(fila, 0);
-        Cancion c = biblioteca.listaBiblioteca.buscar(
-                cancion -> cancion.getNombre().toLowerCase()
-                        .contains(nombre.toLowerCase())
-        );
+        Cancion c = biblioteca.getAbb().buscar(nombre);
+        if (c == null) c = biblioteca.getAvl().buscar(nombre);
         if (c != null) {
             reproductor.reproducir(c);
-            refrescarCancionReproducida();
+            lblCancionActual.setText(c.getNombre());
+            lblArtista.setText(c.getArtista() + " • " + c.getAlbum());
         }
     }
 
@@ -591,7 +560,7 @@ public class VentanaPrincipal extends JFrame {
             return;
         }
         String nombre = (String) modeloBiblioteca.getValueAt(fila, 0);
-        Cancion c = biblioteca.listaBiblioteca.buscar(
+        Cancion c = biblioteca.getListaBiblioteca().buscar(
                 cancion -> cancion.getNombre().toLowerCase()
                         .contains(nombre.toLowerCase())
         );
@@ -608,7 +577,7 @@ public class VentanaPrincipal extends JFrame {
             return;
         }
         String nombre = (String) modeloBiblioteca.getValueAt(fila, 0);
-        Cancion c = biblioteca.listaBiblioteca.buscar(
+        Cancion c = biblioteca.getListaBiblioteca().buscar(
                 cancion -> cancion.getNombre().toLowerCase()
                         .contains(nombre.toLowerCase())
         );
@@ -702,68 +671,38 @@ public class VentanaPrincipal extends JFrame {
     } else {
         accionReproducirSeleccionada();
        }
+    } 
+    
+    private void mostrarRecorrido(String arbol, String tipo) {
+        if (biblioteca.getAbb().isEmpty()) { areaLog.setText("Carga la biblioteca primero."); return; }
+        List<Cancion> lista;
+        if (arbol.equals("ABB")) {
+            lista = tipo.equals("INORDEN") ? biblioteca.getAbb().inOrden()
+                  : tipo.equals("PREORDEN") ? biblioteca.getAbb().preOrden()
+                  : biblioteca.getAbb().postOrden();
+        } else {
+            lista = tipo.equals("INORDEN") ? biblioteca.getAvl().inOrden()
+                  : tipo.equals("PREORDEN") ? biblioteca.getAvl().preOrden()
+                  : biblioteca.getAvl().postOrden();
+        }
+        StringBuilder sb = new StringBuilder("=== " + arbol + " " + tipo + " ===\n");
+        int i = 1;
+        for (Cancion c : lista) {
+            sb.append(i++).append(". ").append(c.getArtista()).append(" - ").append(c.getNombre()).append("\n");
+            if (i > 500) { sb.append("... (truncado a 500 entradas)"); break; }
+        }
+        areaLog.setText(sb.toString());
+        areaLog.setCaretPosition(0);
     }
     
-   private void mostrarRecorrido(String arbol, String tipo) {
-
-      if (biblioteca.getAbb().isEmpty()) {
-        areaLog.setText("Carga la biblioteca primero.");
-        return;
-    }
-        List<Cancion> lista;
-
-        if (arbol.equals("ABB")) {
-        if (tipo.equals("INORDEN")) {
-            lista = biblioteca.getAbb().inOrden();
-        } else if (tipo.equals("PREORDEN")) {
-            lista = biblioteca.getAbb().preOrden();
-        } else {
-            lista = biblioteca.getAbb().postOrden();
-        }
-    } else {
-        if (tipo.equals("INORDEN")) {
-            lista = biblioteca.getAvl().inOrden();
-        } else if (tipo.equals("PREORDEN")) {
-            lista = biblioteca.getAvl().preOrden();
-        } else {
-            lista = biblioteca.getAvl().postOrden();
-        }
-    }
-       StringBuilder texto = new StringBuilder();
-       texto.append("=== ").append(arbol)
-         .append(" ").append(tipo)
-         .append(" ===\n");
-
-        int contador = 1;
-
-        for (Cancion cancion : lista) {
-        texto.append(contador)
-             .append(". ")
-             .append(cancion.getArtista())
-             .append(" - ")
-             .append(cancion.getNombre())
-             .append("\n"); contador++;
-
-        if (contador > 500) {
-            texto.append("... ");
-            break;
-        }
-    }
-    areaLog.setText(texto.toString());
-    areaLog.setCaretPosition(0);
-}
-      
     private void mostrarComparativaCarga() {
         areaLog.setText(biblioteca.getResumenComparativaCarga());
     }
 
     //  HELPERS DE UI
-    private void refrescarTablaBiblioteca(List<Cancion> canciones) {
-
-    modeloBiblioteca.setRowCount(0);
+    private void refrescarTablaBiblioteca(List<Cancion> canciones) {modeloBiblioteca.setRowCount(0);
     if (canciones == null) {
-        for (Cancion c : biblioteca.getListaBiblioteca()) {
-            modeloBiblioteca.addRow(new Object[]{
+        for (Cancion c : biblioteca.getListaBiblioteca()) {modeloBiblioteca.addRow(new Object[]{
                 c.getNombre(),
                 c.getArtista(),
                 c.getAlbum(),
@@ -775,8 +714,7 @@ public class VentanaPrincipal extends JFrame {
             });
         }
     } else {
-        for (Cancion c : canciones) {
-            modeloBiblioteca.addRow(new Object[]{
+        for (Cancion c : canciones) { modeloBiblioteca.addRow(new Object[]{
                 c.getNombre(),
                 c.getArtista(),
                 c.getAlbum(),
@@ -792,17 +730,17 @@ public class VentanaPrincipal extends JFrame {
 
     private void refrescarListaPlaylists() {modeloListaPlaylists.clear();
 
-        for (Playlist p : gestor.getTodas()) {
+    for (Playlist p : gestor.getTodas()) {
         modeloListaPlaylists.addElement(p.getNombre());
       }
     }
 
     private void refrescarCancionReproducida() {
-        Cancion cancion = reproductor.getCancionActual();
+    Cancion cancion = reproductor.getCancionActual();
 
-        if (cancion != null) {
-         String nombre = cancion.getNombre();
-         String info = cancion.getArtista() + " - " + cancion.getAlbum();
+    if (cancion != null) {
+        String nombre = cancion.getNombre();
+        String info = cancion.getArtista() + " - " + cancion.getAlbum();
 
         lblCancionActual.setText(nombre);
         lblArtista.setText(info);
@@ -811,22 +749,18 @@ public class VentanaPrincipal extends JFrame {
 
     private void mostrarCancionesPlaylist() { modeloPlaylist.setRowCount(0);
 
-         String nombrePlaylist = listaPlaylists.getSelectedValue();
-         if (nombrePlaylist == null) {
-             
+    String nombrePlaylist = listaPlaylists.getSelectedValue();
+    if (nombrePlaylist == null) {
         return;
     }
-
     // Buscar playlist
     Playlist playlist = gestor.buscarPlaylist(nombrePlaylist);
 
-         if (playlist == null) {
-             
+    if (playlist == null) {
         return;
     }
-
     // Mostrar canciones
-        for (Cancion cancion : playlist.getCanciones()) {
+    for (Cancion cancion : playlist.getCanciones()) {
         modeloPlaylist.addRow(new Object[]{
             cancion.getNombre(),
             cancion.getArtista(),
@@ -837,18 +771,13 @@ public class VentanaPrincipal extends JFrame {
        }
     }
     
-     private void actualizarEstadoArboles() {
-        lblEstABB.setText(
-            "ABB: " + biblioteca.getAbb().getTotalNodos()
-            + " nodos | Altura: "
-            + biblioteca.getAbb().getAltura()
-    );
-    lblEstAVL.setText(
-            "AVL: " + biblioteca.getAvl().getTotalNodos()
-            + " nodos | Altura: "
-            + biblioteca.getAvl().getAltura()
-    );
-}
+      private void actualizarEstadoArboles() {
+        lblEstABB.setText("ABB: " + biblioteca.getAbb().getTotalNodos() +
+                " nodos | Altura: " + biblioteca.getAbb().altura());
+        lblEstAVL.setText("AVL: " + biblioteca.getAvl().getTotalNodos() +
+                " nodos | Altura: " + biblioteca.getAvl().altura());
+    }
+
     private JTable crearTabla(DefaultTableModel modelo) {
         JTable tabla = new JTable(modelo) {
             @Override
