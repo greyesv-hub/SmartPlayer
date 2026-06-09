@@ -149,19 +149,19 @@ public class EstadisticasMusical {
 
         StringBuilder sb = new StringBuilder();
         sb.append("╔══════════════════════════════════════╗\n");
-        sb.append("║        ESTADÍSTICAS SMART PLAYER     ║\n");
+        sb.append("║        ESTADISTICAS SMART PLAYER     ║\n");
         sb.append("╚══════════════════════════════════════╝\n\n");
         sb.append("► Canciones totales    : ").append(biblioteca.getTotalCargadas()).append("\n");
         sb.append("► Tamaño total         : ").append(getTamanoTotalFormateado()).append("\n");
-        sb.append("► Promedio duración    : ").append(
+        sb.append("► Promedio duracion    : ").append(
                 String.format("%.1f seg (%.1f min)", getPromedioDuracion(), getPromedioDuracion()/60)).append("\n");
-        sb.append("► Artista más escuchado: ").append(getArtistaMasEscuchado()).append("\n");
-        sb.append("► Género más frecuente : ").append(getGeneroMasFrecuente()).append("\n");
-        sb.append("► Canción más reprod.  : ").append(
+        sb.append("► Artista mas escuchado: ").append(getArtistaMasEscuchado()).append("\n");
+        sb.append("► Genero mas frecuente : ").append(getGeneroMasFrecuente()).append("\n");
+        sb.append("► Cancion mas reprod  : ").append(
                 masRep != null ? masRep.getNombre() + " (" + masRep.getVecesReproducida() + "x)" : "N/A").append("\n");
-        sb.append("► Playlist más grande  : ").append(
+        sb.append("► Playlist mas grande  : ").append(
                 masGrande != null ? masGrande.getNombre() + " (" + masGrande.getTotalCanciones() + " canciones)" : "N/A").append("\n");
-        sb.append("► Playlist más larga   : ").append(
+        sb.append("► Playlist mas larga   : ").append(
                 masLarga != null ? masLarga.getNombre() + " (" + masLarga.getDuracionTotalFormateada() + ")" : "N/A").append("\n");
         sb.append("► Duplicados           : ").append(duplicados.size()).append(
                 String.format(" (%.2f MB desperdiciados)", tamDup / (1024.0 * 1024.0))).append("\n\n");
