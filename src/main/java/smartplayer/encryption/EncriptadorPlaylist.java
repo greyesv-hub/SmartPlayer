@@ -34,6 +34,10 @@ public class EncriptadorPlaylist {
         return xorConClave(contenido, clave);
     }
     
+     public static String desencriptar(String contenidoCifrado, Playlist playlist, TipoRecorrido recorrido) {
+        return encriptar(contenidoCifrado, playlist, recorrido);
+    }
+     
      private static String generarClave(Playlist playlist, TipoRecorrido recorrido) {
      ArbolBinarioBusqueda abb = new ArbolBinarioBusqueda();
 
@@ -135,4 +139,35 @@ public class EncriptadorPlaylist {
         return p;
     }
      
+      public static String encriptarParaGuardar(Playlist playlist, TipoRecorrido recorrido) {
+  
+      String plano = exportarPlaylist(playlist);
+      String cifrado = encriptar(plano,playlist, recorrido);
+
+      playlist.setEncriptada(true);
+      return "#ENC:" + recorrido.name() + "\n" + cifrado;
+    }
+
+      public static Playlist desencriptarArchivo(String contenidoCifrado, Playlist referencia) {
+
+       String[] partes = contenidoCifrado.split("\n", 2);
+
+       if (partes.length < 2) {
+        return null;
+    }
+       String encabezado = partes[0];
+       String cifrado = partes[1];
+
+       TipoRecorrido rec = TipoRecorrido.IN_ORDEN;
+
+       if (encabezado.contains("PRE_ORDEN")) {
+        rec = TipoRecorrido.PRE_ORDEN;
+    }else if (encabezado.contains("POST_ORDEN")) {
+        rec = TipoRecorrido.POST_ORDEN;
+    }
+
+       String plano = desencriptar(cifrado, referencia,rec);
+       return importarPlaylist(plano);
+    }
+      
 }
