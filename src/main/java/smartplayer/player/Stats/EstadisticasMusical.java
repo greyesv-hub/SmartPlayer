@@ -52,25 +52,47 @@ public class EstadisticasMusical {
             .orElse("N/A");
     }
 
-    public String getGeneroMasFrecuente() {
-        Map<String, Integer> conteo = new HashMap<>();
-        for (Cancion c : biblioteca.getListaBiblioteca()) {
-            conteo.merge(c.getGenero(), 1, Integer::sum);
+       public String getGeneroMasFrecuente() {Map<String, Integer> conteo = new HashMap<>();
+
+        for (Cancion c : biblioteca.getListaBiblioteca()) {String genero = c.getGenero();
+          if (conteo.containsKey(genero)) {
+            conteo.put(genero, conteo.get(genero) + 1);
+        }else{
+            conteo.put(genero, 1);
         }
-        return conteo.entrySet().stream()
-                .max(Map.Entry.comparingByValue())
-                .map(Map.Entry::getKey)
-                .orElse("N/A");
     }
 
-    public double getPromedioDuracion() {
-        int total = 0;
-        double suma = 0;
-        for (Cancion c : biblioteca.getListaBiblioteca()) {
-            suma += c.getDuracion(); total++;
+        String generoMasFrecuente = "N/A";
+        int mayor = 0;
+
+        for (Map.Entry<String, Integer> dato : conteo.entrySet()) {
+
+        if (dato.getValue() > mayor) {
+            mayor = dato.getValue();
+            generoMasFrecuente = dato.getKey();
         }
-        return (total > 0) ? suma / total : 0;
     }
+         return generoMasFrecuente;
+    }
+
+// ── Promedio de duración ───────────────────────────────────────────────
+
+public double getPromedioDuracion() {
+
+    double suma = 0;
+    int total = 0;
+
+    for (Cancion c : biblioteca.getListaBiblioteca()) {
+        suma += c.getDuracion();
+        total++;
+    }
+
+    if (total == 0) {
+        return 0;
+    }
+
+    return suma / total;
+}
 
     public long getTamanoTotalBytes() {
         long total = 0;
