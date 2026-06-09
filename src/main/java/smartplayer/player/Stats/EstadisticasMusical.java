@@ -61,7 +61,6 @@ public class EstadisticasMusical {
             conteo.put(genero, 1);
         }
     }
-
         String generoMasFrecuente = "N/A";
         int mayor = 0;
 
@@ -75,24 +74,19 @@ public class EstadisticasMusical {
          return generoMasFrecuente;
     }
 
-// ── Promedio de duración ───────────────────────────────────────────────
+        public double getPromedioDuracion() {
 
-public double getPromedioDuracion() {
+        double suma = 0;
+        int total = 0;
 
-    double suma = 0;
-    int total = 0;
-
-    for (Cancion c : biblioteca.getListaBiblioteca()) {
-        suma += c.getDuracion();
-        total++;
+        for (Cancion c : biblioteca.getListaBiblioteca()) {
+          suma += c.getDuracion(); total++;
     }
-
-    if (total == 0) {
-        return 0;
+        if (total == 0) {
+           return 0;
     }
-
-    return suma / total;
-}
+        return suma / total;
+    }
 
     public long getTamanoTotalBytes() {
         long total = 0;
