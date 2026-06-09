@@ -4,10 +4,145 @@
  */
 package smartplayer.player.Stats;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import smartplayer.model.Cancion;
+import smartplayer.model.Playlist;
+import smartplayer.player.BibliotecaMusical;
+import smartplayer.player.GestorPlaylist;
 /**
- *
+ *Genera reportes sobre la biblioteca y las playlists
  * @author rmari
  */
 public class EstadisticasMusical {
-    
+
+       private final BibliotecaMusical biblioteca;
+       private final GestorPlaylist   gestor;
+
+       private long ultimaBusquedaABB;
+       private long ultimaBusquedaAVL;
+
+       public EstadisticasMusical(BibliotecaMusical b, GestorPlaylist g) {
+        this.biblioteca = b;
+        this.gestor     = g;
+    }
+
+       public Cancion getCancionMasReproducida() {
+        Cancion cancionMasReproducida = null;
+
+        for (Cancion cancion : biblioteca.getListaBiblioteca()) {
+            if (cancionMasReproducida == null || cancion.getVecesReproducida() > cancionMasReproducida.getVecesReproducida()) {
+            cancionMasReproducida = cancion;
+        }
+    }
+        return cancionMasReproducida;
+    }
+
+       public String getArtistaMasEscuchado() {Map<String, Integer> conteo = new HashMap<>();
+
+       for (Cancion cancion : biblioteca.getListaBiblioteca()) {
+        conteo.merge(cancion.getArtista(),cancion.getVecesReproducida(),Integer::sum);
+    }
+
+        return conteo.entrySet()
+            .stream()
+            .max(Map.Entry.comparingByValue())
+            .map(Map.Entry::getKey)
+            .orElse("N/A");
+    }
+
+    public String getGeneroMasFrecuente() {
+        Map<String, Integer> conteo = new HashMap<>();
+        for (Cancion c : biblioteca.getListaBiblioteca()) {
+            conteo.merge(c.getGenero(), 1, Integer::sum);
+        }
+        return conteo.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse("N/A");
+    }
+
+    public double getPromedioDuracion() {
+        int total = 0;
+        double suma = 0;
+        for (Cancion c : biblioteca.getListaBiblioteca()) {
+            suma += c.getDuracion(); total++;
+        }
+        return (total > 0) ? suma / total : 0;
+    }
+
+    public long getTamanoTotalBytes() {
+        long total = 0;
+        for (Cancion c : biblioteca.getListaBiblioteca()) total += c.getTamano();
+        return total;
+    }
+
+    public String getTamanoTotalFormateado() {
+        double gb = getTamanoTotalBytes() / (1024.0 * 1024.0 * 1024.0);
+        return String.format("%.2f GB", gb);
+    }
+
+    public List<Cancion[]> getDuplicados() {
+        return biblioteca.detectarDuplicados();
+    }
+
+    public void medirBusqueda(String nombre) {
+        long t0 = System.nanoTime();
+        biblioteca.getAbb().buscar(nombre);
+        ultimaBusquedaABB = System.nanoTime() - t0;
+
+        t0 = System.nanoTime();
+        biblioteca.getAvl().buscar(nombre);
+        ultimaBusquedaAVL = System.nanoTime() - t0;
+    }
+
+    public String getResumenBusqueda(String nombre) {
+        medirBusqueda(nombre);
+        return String.format(
+            " COMPARATIVA DE BUSQUEDA: '%s' \n" +
+            "ABB : %.4f ms\n" +
+            "AVL : %.4f ms\n" +
+            "Más rápido: %s\n",
+            nombre,
+            ultimaBusquedaABB / 1_000_000.0,
+            ultimaBusquedaAVL / 1_000_000.0,
+            (ultimaBusquedaABB <= ultimaBusquedaAVL) ? "ABB" : "AVL"
+        );
+    }
+
+    public String getReporteCompleto() {
+        Cancion masRep = getCancionMasReproducida();
+        Playlist masGrande = gestor.getPlaylistMasGrande();
+        Playlist masLarga  = gestor.getPlaylistMasLarga();
+        List<Cancion[]> duplicados = getDuplicados();
+
+        long tamDup = 0;
+        for (Cancion[] par : duplicados) tamDup += par[1].getTamano();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("╔══════════════════════════════════════╗\n");
+        sb.append("║        ESTADÍSTICAS SMART PLAYER     ║\n");
+        sb.append("╚══════════════════════════════════════╝\n\n");
+        sb.append("► Canciones totales    : ").append(biblioteca.getTotalCargadas()).append("\n");
+        sb.append("► Tamaño total         : ").append(getTamanoTotalFormateado()).append("\n");
+        sb.append("► Promedio duración    : ").append(
+                String.format("%.1f seg (%.1f min)", getPromedioDuracion(), getPromedioDuracion()/60)).append("\n");
+        sb.append("► Artista más escuchado: ").append(getArtistaMasEscuchado()).append("\n");
+        sb.append("► Género más frecuente : ").append(getGeneroMasFrecuente()).append("\n");
+        sb.append("► Canción más reprod.  : ").append(
+                masRep != null ? masRep.getNombre() + " (" + masRep.getVecesReproducida() + "x)" : "N/A").append("\n");
+        sb.append("► Playlist más grande  : ").append(
+                masGrande != null ? masGrande.getNombre() + " (" + masGrande.getTotalCanciones() + " canciones)" : "N/A").append("\n");
+        sb.append("► Playlist más larga   : ").append(
+                masLarga != null ? masLarga.getNombre() + " (" + masLarga.getDuracionTotalFormateada() + ")" : "N/A").append("\n");
+        sb.append("► Duplicados           : ").append(duplicados.size()).append(
+                String.format(" (%.2f MB desperdiciados)", tamDup / (1024.0 * 1024.0))).append("\n\n");
+        sb.append(biblioteca.getResumenComparativaCarga());
+        return sb.toString();
+    }
+
+    public long getUltimaBusquedaABB() { return ultimaBusquedaABB; }
+    public long getUltimaBusquedaAVL() { return ultimaBusquedaAVL; }
 }
+
