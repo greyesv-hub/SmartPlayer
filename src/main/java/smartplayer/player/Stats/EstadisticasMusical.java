@@ -85,48 +85,59 @@ public class EstadisticasMusical {
         if (total == 0) {
            return 0;
     }
-        return suma / total;
+         return suma / total;
     }
 
-    public long getTamanoTotalBytes() {
-        long total = 0;
-        for (Cancion c : biblioteca.getListaBiblioteca()) total += c.getTamano();
-        return total;
+        public long getTamanoTotalBytes() {
+        
+          long total = 0;
+        
+           for (Cancion c : biblioteca.getListaBiblioteca()) 
+            total += c.getTamano();
+         return total;
     }
 
-    public String getTamanoTotalFormateado() {
-        double gb = getTamanoTotalBytes() / (1024.0 * 1024.0 * 1024.0);
-        return String.format("%.2f GB", gb);
+        public String getTamanoTotalFormateado() {
+
+        double tamanoGB = getTamanoTotalBytes() / 1024.0 / 1024.0 / 1024.0;
+         return tamanoGB + " GB";
     }
 
-    public List<Cancion[]> getDuplicados() {
-        return biblioteca.detectarDuplicados();
+        public List<Cancion[]> getDuplicados() {
+         return biblioteca.detectarDuplicados();
     }
 
-    public void medirBusqueda(String nombre) {
-        long t0 = System.nanoTime();
-        biblioteca.getAbb().buscar(nombre);
-        ultimaBusquedaABB = System.nanoTime() - t0;
+        public void medirBusqueda(String nombre) {
 
-        t0 = System.nanoTime();
-        biblioteca.getAvl().buscar(nombre);
-        ultimaBusquedaAVL = System.nanoTime() - t0;
+         long inicioABB = System.nanoTime();
+         biblioteca.getAbb().buscar(nombre);
+         ultimaBusquedaABB = System.nanoTime() - inicioABB;
+
+         long inicioAVL = System.nanoTime();
+         biblioteca.getAvl().buscar(nombre);
+         ultimaBusquedaAVL = System.nanoTime() - inicioAVL;
     }
 
-    public String getResumenBusqueda(String nombre) {
-        medirBusqueda(nombre);
+        public String getResumenBusqueda(String nombre) {medirBusqueda(nombre);
+
+        double tiempoABB = ultimaBusquedaABB / 1000000.0;
+        double tiempoAVL = ultimaBusquedaAVL / 1000000.0;
+        String masRapido;
+
+        if (tiempoABB <= tiempoAVL) {
+        masRapido = "ABB";
+        }else{
+        masRapido = "AVL";
+    }
         return String.format(
-            " COMPARATIVA DE BUSQUEDA: '%s' \n" +
-            "ABB : %.4f ms\n" +
-            "AVL : %.4f ms\n" +
-            "Más rápido: %s\n",
-            nombre,
-            ultimaBusquedaABB / 1_000_000.0,
-            ultimaBusquedaAVL / 1_000_000.0,
-            (ultimaBusquedaABB <= ultimaBusquedaAVL) ? "ABB" : "AVL"
-        );
+           " COMPARATIVA DE BUSQUEDA: '%s' \n" +
+           "ABB : %.4f ms\n" +
+           "AVL : %.4f ms\n" +
+           "Mas rapido: %s\n",
+           nombre, tiempoABB, tiempoAVL, masRapido);
     }
-
+        
+        
     public String getReporteCompleto() {
         Cancion masRep = getCancionMasReproducida();
         Playlist masGrande = gestor.getPlaylistMasGrande();
