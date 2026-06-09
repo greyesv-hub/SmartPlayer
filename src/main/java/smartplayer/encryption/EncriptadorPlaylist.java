@@ -93,5 +93,46 @@ public class EncriptadorPlaylist {
         return sb.toString();
     }
      
+     public static Playlist importarPlaylist(String contenido) {
+
+     String[] lineas = contenido.split("\n");
+
+     String nombre = "PlaylistImportada";
+     Playlist p = null;
+     boolean enCanciones = false;
+
+     for (String linea : lineas) {
+        if (linea.startsWith("NOMBRE:")) {
+            nombre = linea.substring(7);
+            p = new Playlist(nombre);
+
+        }else if (linea.equals("CANCIONES:")) {
+            enCanciones = true;
+        }else if (enCanciones && p != null && !linea.isEmpty() && !linea.startsWith("#")) {
+            String[] parts = linea.split("\\|");
+
+            if (parts.length >= 8) {
+                try {
+                    Cancion c = new Cancion(
+                        parts[0],
+                        parts[1],
+                        parts[2],
+                        parts[3],
+                        Double.parseDouble(parts[4]),
+                        Long.parseLong(parts[5]),
+                        parts[6],
+                        Integer.parseInt(parts[7]));
+                    p.agregarCancion(c);
+
+                  }catch (NumberFormatException e) {
+                }
+            }
+        }
+    }
+        if (p == null) {
+        return new Playlist(nombre);
+    }
+        return p;
+    }
      
 }
