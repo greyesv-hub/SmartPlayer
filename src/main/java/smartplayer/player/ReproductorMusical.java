@@ -170,19 +170,17 @@ public class ReproductorMusical {
             return null;
         }
     }
-    
-     //  Modo de reproduccion 
+
     public void setModo(ModoReproduccion modo){ 
         this.modo = modo; 
-    }//Cambia el modo de reproduccion actual
+    }
     public ModoReproduccion getModo(){ 
         return modo; 
     }
 
-    //  Getters de estado//Porque las variables son privadas
     public Cancion        getCancionActual(){ 
         return cancionActual; }
-    public boolean        isReproduciendo(){ //tipo boolean
+    public boolean        isReproduciendo(){ 
         return reproduciendo; }
     public boolean        isPausado(){ 
         return pausado; }
@@ -190,8 +188,7 @@ public class ReproductorMusical {
         return colaReproduccion; }
     public Pila<Cancion>  getHistorial(){ 
         return historial; }
-
-    // Resumen del historial de reproduccion 
+ 
     public String getHistorialString() {
         
          if (historial.isEmpty()) {
@@ -201,7 +198,6 @@ public class ReproductorMusical {
        }
     }
 
-    // Resumen de la cola de reproduccion 
     public String getColaString() {
          if (colaReproduccion.isEmpty()) {
         return "Cola vacia";
