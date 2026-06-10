@@ -69,27 +69,31 @@ public class ReproductorMusical {
         }
     }
       // Continua desde donde se pauso
-    public void continuar() {
+   public void continuar() {
         if (pausado && cancionActual != null) {
             pausado = false;
-            iniciarReproduccion(cancionActual); // Reinicia la cancion actual
+            detenidoManualmente = false;
+            iniciarReproduccion(cancionActual);
+        }
+    }
+    
+       public void siguiente() {
+        detener();
+        Cancion sig = obtenerSiguiente();
+        if (sig != null) {
+            reproducir(sig);
         }
     }
 
-    // Pasa a la siguiente cancion      
-    public void siguiente() {
+     public void anterior() {
+        if (historial.getTamano() < 2) {
+            return; 
+        }
+        historial.pop(); 
+        Cancion ant = historial.peek(); 
         detener();
-        Cancion sig = obtenerSiguiente();
-        if (sig != null) reproducir(sig);
-    }
-
-    // Regresa a la cancion anterior (desde historial) 
-    public void anterior() {
-        if (historial.getTamano() < 2) return;//cancion actual y anterior
-        historial.pop(); // Elimina la cancion actual (pop = elimina y devuelve)
-        Cancion ant = historial.peek();//Obtiene la nueva cima SIN eliminarla (solo observa)
-        detener();
-        reproducir(ant);
+        cancionActual = ant;
+        iniciarReproduccion(ant);
     }
 
     // Detiene la reproduccion completamente 
