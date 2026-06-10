@@ -68,8 +68,8 @@ public class ReproductorMusical {
             }
         }
     }
-      // Continua desde donde se pauso
-   public void continuar() {
+
+     public void continuar() {
         if (pausado && cancionActual != null) {
             pausado = false;
             detenidoManualmente = false;
@@ -96,14 +96,15 @@ public class ReproductorMusical {
         iniciarReproduccion(ant);
     }
 
-    // Detiene la reproduccion completamente 
-    public void detener() {
-        if (player != null) {//verifica si lo archivos se estan reproduciendo correctamente
-            player.close();//detiene los audios 
-            player = null;//libera la memoria 
+     public void detener() {detenidoManualmente = true;
+        if (player != null) {
+            try {
+                player.close();
+            } catch (Exception ignored) {}
+            player = null;
         }
         if (hiloReproduccion != null) {
-            hiloReproduccion.interrupt();//Que es interrupt()? Envaa una señal de interrupcion al thread.
+            hiloReproduccion.interrupt();
             hiloReproduccion = null;
         }
         reproduciendo = false;
@@ -112,46 +113,32 @@ public class ReproductorMusical {
         pauseFrame = 0;
     }
     
-   //  Reproduccion interna
     private void iniciarReproduccion(Cancion c) {
         hiloReproduccion = new Thread(() -> {
-            // Bandera local exclusiva de este bloque. Ningún hilo externo la puede alterar.
-            boolean terminadaNaturalmente = false;
 
-            try (FileInputStream fis = new FileInputStream(c.getRuta())) {
-                
+            boolean terminadaNaturalmente = false;
+            try (FileInputStream fis = new FileInputStream(c.getRuta())) {               
                 synchronized (this) {
-                    // Doble verificación: si quedaba un residuo del player anterior, lo cerramos
                     if (player != null) {
                         try { player.close(); } catch (Exception ignored) {}
                     }
                     player = new AdvancedPlayer(fis);
                     reproduciendo = true;
-                }
-
-                // El hilo se suspende aquí ejecutando el flujo nativo de la canción
-                player.play();
-
-                // Si llega aquí de forma lineal es porque leyó el archivo mp3 completo
+                }player.play();
                 terminadaNaturalmente = true;
-
             } catch (Exception e) {
-                // Al presionar stop/pause/next, saltará un BitstreamException/IOException aquí.
-                // Como detenidoManualmente cambia a true, evitamos imprimir trazas falsas de error.
                 if (!detenidoManualmente) {
                     System.err.println("Error reproduciendo: " + e.getMessage());
                 }
             } finally {
                 reproduciendo = false;
-
-                // Verificamos de forma segura si la pista terminó sola y por completo
                 if (terminadaNaturalmente && !pausado && !detenidoManualmente) {
                     onCancionTerminada();
                 }
             }
         });
 
-        hiloReproduccion.setDaemon(true); // Hace que el hilo muera si se cierra la app principal
+        hiloReproduccion.setDaemon(true); 
         hiloReproduccion.start();
     }
 
