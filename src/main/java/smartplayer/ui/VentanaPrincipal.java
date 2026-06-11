@@ -2,7 +2,7 @@ package smartplayer.ui;
 
 import smartplayer.model.Cancion;
 import smartplayer.player.*;
-import smartplayer.model.Playlist;
+import smartplayer.Stats.EstadisticasMusical; 
 import smartplayer.structures.ArbolAVL;
 import smartplayer.structures.ArbolBinarioBusqueda; 
 
@@ -13,16 +13,14 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
+import smartplayer.encryption.EncriptadorPlaylist;
 import smartplayer.model.Playlist;
+import smartplayer.utils.GestorArchivos;
+import smartplayer.utils.VisualizadorArbol;
 
-/**
- * Interfaz Grafica Principal de Smart Player.
- *
- */
 public class VentanaPrincipal extends JFrame {
 
-     //  Colores del tema 
-    private static final Color COLOR_FONDO = new Color(18, 18, 18);
+     private static final Color COLOR_FONDO = new Color(18, 18, 18);
     private static final Color COLOR_PANEL = new Color(30, 30, 30);
     private static final Color COLOR_ACENTO = new Color(29, 185, 84);   // verde Spotify
     private static final Color COLOR_ACENTO2 = new Color(0, 120, 215);   // azul
@@ -38,8 +36,8 @@ public class VentanaPrincipal extends JFrame {
     private final BibliotecaMusical biblioteca = new BibliotecaMusical();
     private final ReproductorMusical reproductor = new ReproductorMusical();
     private final GestorPlaylist gestor = new GestorPlaylist();
+    private final EstadisticasMusical estadisticas = new EstadisticasMusical(biblioteca, gestor);
 
-    //  Componentes UI 
     private JTabbedPane pestanas;
     private JTable tablaBiblioteca;
     private DefaultTableModel modeloBiblioteca;
@@ -58,6 +56,10 @@ public class VentanaPrincipal extends JFrame {
     private DefaultListModel<String> modeloListaPlaylists;
     private JLabel lblEstABB, lblEstAVL;
     private JTextArea areaEstadisticas;
+    
+    private Timer timerProgreso;
+    private long inicioReproduccion;
+    private JTextArea areaColaMini;
 
 
     public VentanaPrincipal() {
@@ -81,11 +83,8 @@ public class VentanaPrincipal extends JFrame {
 
     private void inicializarUI() {
         setLayout(new BorderLayout(0, 0));
-
-        // Panel superior con logo y controles globales
         add(crearPanelSuperior(), BorderLayout.NORTH);
 
-        // Panel central con pestañas
         pestanas = new JTabbedPane(JTabbedPane.TOP);
         pestanas.setBackground(COLOR_PANEL);
         pestanas.setForeground(COLOR_TEXTO);
@@ -97,11 +96,9 @@ public class VentanaPrincipal extends JFrame {
         pestanas.addTab(" Encriptacion", crearPestanaEncriptacion());
         add(pestanas, BorderLayout.CENTER);
 
-        // Panel inferior con reproductor
         add(crearPanelReproductor(), BorderLayout.SOUTH);
     }
 
-    //  Panel Superior 
     private JPanel crearPanelSuperior() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(COLOR_PANEL);
@@ -123,13 +120,11 @@ public class VentanaPrincipal extends JFrame {
         return panel;
     }
 
-    //  Pestaña Biblioteca 
     private JPanel crearPestanaBiblioteca() {
         JPanel panel = new JPanel(new BorderLayout(8, 8));
         panel.setBackground(COLOR_FONDO);
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Barra de busqueda
         JPanel panelBusqueda = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         panelBusqueda.setBackground(COLOR_FONDO);
 
@@ -176,7 +171,6 @@ public class VentanaPrincipal extends JFrame {
         JScrollPane scroll = new JScrollPane(tablaBiblioteca);
         scroll.getViewport().setBackground(COLOR_FONDO);
 
-        // Barra inferior con acciones rapidas
         JPanel panelAcciones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
         panelAcciones.setBackground(COLOR_FONDO);
         JButton btnAgregarCola = crearBoton(" Cola", new Color(100, 100, 200));
@@ -197,7 +191,6 @@ public class VentanaPrincipal extends JFrame {
         panel.setBackground(COLOR_FONDO);
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Lista de playlists (izquierda)
         modeloListaPlaylists = new DefaultListModel<>();
         listaPlaylists = new JList<>(modeloListaPlaylists);
         listaPlaylists.setBackground(COLOR_PANEL);
@@ -268,7 +261,6 @@ public class VentanaPrincipal extends JFrame {
         panel.setBackground(COLOR_FONDO);
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Area para recorridos
         areaLog = new JTextArea();
         areaLog.setBackground(COLOR_PANEL);
         areaLog.setForeground(new Color(0, 255, 100));
@@ -277,7 +269,6 @@ public class VentanaPrincipal extends JFrame {
         JScrollPane scrollLog = new JScrollPane(areaLog);
         titularPanel(scrollLog, "Recorridos / Comparativas");
 
-        // Botones de recorridos
         JPanel panelBotones = new JPanel(new GridLayout(3, 3, 6, 6));
         panelBotones.setBackground(COLOR_FONDO);
         panelBotones.setBorder(BorderFactory.createEmptyBorder(6, 0, 0, 0));
@@ -293,13 +284,20 @@ public class VentanaPrincipal extends JFrame {
             crearBoton(" Graphviz ABB", new Color(100, 0, 200)),
             crearBoton(" Graphviz AVL", new Color(100, 0, 200)),};
 
+        botones[0].addActionListener(e -> mostrarRecorrido("ABB", "INORDEN"));
+        botones[1].addActionListener(e -> mostrarRecorrido("ABB", "PREORDEN"));
+        botones[2].addActionListener(e -> mostrarRecorrido("ABB", "POSTORDEN"));
+        botones[3].addActionListener(e -> mostrarRecorrido("AVL", "INORDEN"));
+        botones[4].addActionListener(e -> mostrarRecorrido("AVL", "PREORDEN"));
+        botones[5].addActionListener(e -> mostrarRecorrido("AVL", "POSTORDEN"));
         botones[6].addActionListener(e -> mostrarComparativaCarga());
+        botones[7].addActionListener(e -> generarGraphviz("ABB"));
+        botones[8].addActionListener(e -> generarGraphviz("AVL")); 
 
         for (JButton b : botones) {
             panelBotones.add(b);
         }
 
-        // Etiquetas de estado
         lblEstABB = new JLabel("ABB: 0 nodos | Altura: 0");
         lblEstAVL = new JLabel("AVL: 0 nodos | Altura: 0");
         lblEstABB.setForeground(COLOR_ACENTO2);
@@ -343,14 +341,22 @@ public class VentanaPrincipal extends JFrame {
         JTextField txtMedir = new JTextField(20);
         estilizar(txtMedir);
         JButton btnMedir = crearBoton(" Medir Busqueda", COLOR_ACENTO2);
+        
+        btnActualizar.addActionListener(e -> areaEstadisticas.setText(estadisticas.getReporteCompleto()));
+        btnDuplicados.addActionListener(e -> mostrarDuplicados());
+        btnMedir.addActionListener(e -> {
+            String t = txtMedir.getText().trim();
+            if (!t.isEmpty()) {
+                areaEstadisticas.setText(estadisticas.getResumenBusqueda(t));
+            }
+        });
 
         panelBotones.add(btnActualizar);
         panelBotones.add(btnDuplicados);
         panelBotones.add(new JLabel("Termino:") {
             {
                 setForeground(COLOR_TEXTO);
-            }
-        });
+            }});
         panelBotones.add(txtMedir);
         panelBotones.add(btnMedir);
 
@@ -359,7 +365,6 @@ public class VentanaPrincipal extends JFrame {
         return panel;
     }
 
-    //  Pestaña Encriptacion
     private JPanel crearPestanaEncriptacion() {
         JPanel panel = new JPanel(new BorderLayout(8, 8));
         panel.setBackground(COLOR_FONDO);
@@ -386,6 +391,44 @@ public class VentanaPrincipal extends JFrame {
         JButton btnEnc = crearBoton(" Encriptar y Exportar", new Color(180, 50, 220));
         JButton btnDec = crearBoton(" Importar y Desencriptar", COLOR_ACENTO2);
 
+         btnEnc.addActionListener(e -> {
+            String nombre = txtNombrePlaylist.getText().trim();
+            Playlist p = gestor.buscarPlaylist(nombre);
+            if (p == null) {
+                areaEnc.setText("Playlist no encontrada: " + nombre);
+                return;
+            }
+            EncriptadorPlaylist.TipoRecorrido rec = getTipoRecorrido(comboRecorrido.getSelectedIndex());
+            JFileChooser fc = new JFileChooser();
+            fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+                boolean ok = GestorArchivos.exportarPlaylistEncriptada(p, fc.getSelectedFile().getAbsolutePath(), rec);
+                areaEnc.setText(ok ? " Playlist encriptada y exportada correctamente\nRecorrido: " + rec.name()
+                        : "Error al exportar");
+            }
+        });
+
+        btnDec.addActionListener(e -> {
+            JFileChooser fc = new JFileChooser();
+            if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                String nombre = txtNombrePlaylist.getText().trim();
+                Playlist ref = gestor.buscarPlaylist(nombre);
+                if (ref == null) {
+                    areaEnc.setText("Playlist de referencia no encontrada.");
+                    return;
+                }
+                Playlist importada = GestorArchivos.importarPlaylistEncriptada(fc.getSelectedFile().getAbsolutePath(), ref);
+                if (importada != null) {
+                    gestor.crearPlaylist(importada.getNombre() + "_importada");
+                    areaEnc.setText(" Playlist desencriptada: " + importada.getNombre()
+                            + "\n" + importada.getTotalCanciones() + " canciones recuperadas.");
+                    refrescarListaPlaylists();
+                } else {
+                    areaEnc.setText(" Error al desencriptar.");
+                }
+            }
+        });
+        
         panelBotones.add(new JLabel("Playlist:") {
             {
                 setForeground(COLOR_TEXTO);
@@ -406,14 +449,12 @@ public class VentanaPrincipal extends JFrame {
         return panel;
     }
 
-    // Panel Reproductor 
     private JPanel crearPanelReproductor() {
         JPanel panel = new JPanel(new BorderLayout(8, 0));
         panel.setBackground(COLOR_PANEL);
         panel.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
         panel.setPreferredSize(new Dimension(0, 100));
 
-        // Info de la cancion
         JPanel panelInfo = new JPanel(new GridLayout(2, 1));
         panelInfo.setBackground(COLOR_PANEL);
         lblCancionActual = new JLabel("Sin reproduccion");
@@ -426,7 +467,6 @@ public class VentanaPrincipal extends JFrame {
         panelInfo.add(lblArtista);
         panelInfo.setPreferredSize(new Dimension(250, 0));
 
-        // Controles centrales
         JPanel panelControles = new JPanel(new BorderLayout(0, 4));
         panelControles.setBackground(COLOR_PANEL);
 
@@ -437,11 +477,28 @@ public class VentanaPrincipal extends JFrame {
         btnPause = crearBotonIcono("⏸");
         btnStop = crearBotonIcono("⏹");
         btnNext = crearBotonIcono("⏭");
-        btnPrev.addActionListener(e -> { reproductor.anterior(); refrescarCancionReproducida(); });
-        btnPlay.addActionListener(e -> accionPlay());
-        btnPause.addActionListener(e -> reproductor.pausar());
-        btnStop.addActionListener(e -> { reproductor.detener(); refrescarCancionReproducida(); });
-        btnNext.addActionListener(e -> { reproductor.siguiente(); refrescarCancionReproducida();});
+        
+            btnPrev.addActionListener(e -> {
+            reproductor.anterior();
+            mostrarCancionActual();
+            areaColaMini.setText(reproductor.getColaString());
+        });
+        btnPlay.addActionListener(e -> {
+            accionPlay();
+            iniciarTimerProgreso();
+        });
+        btnPause.addActionListener(e -> { reproductor.pausar(); detenerTimerProgreso(); });
+        btnStop.addActionListener(e -> {
+            reproductor.detener();
+            mostrarCancionActual();
+            detenerTimerProgreso();
+        });
+        btnNext.addActionListener(e -> {
+            reproductor.siguiente();
+            mostrarCancionActual();
+            areaColaMini.setText(reproductor.getColaString());
+        });
+        
         panelBotones.add(btnPrev);
         panelBotones.add(btnPlay);
         panelBotones.add(btnPause);
@@ -478,13 +535,31 @@ public class VentanaPrincipal extends JFrame {
         });
         panelModo.add(comboModo);
         panelModo.add(lblTiempo);
+        
+          // —— 4. COLA DE REPRODUCCIÓN ——
+        areaColaMini = new JTextArea();
+        areaColaMini.setBackground(new Color(25, 25, 25));
+        areaColaMini.setForeground(COLOR_ACENTO);
+        areaColaMini.setFont(new Font("Consolas", Font.PLAIN, 11));
+        areaColaMini.setEditable(false);
+        areaColaMini.setText("Cola vacía");
+
+        JScrollPane scrollColaMini = new JScrollPane(areaColaMini);
+        scrollColaMini.setPreferredSize(new Dimension(220, 65)); 
+        scrollColaMini.setBorder(BorderFactory.createLineBorder(new Color(50, 50, 50), 1));
+        scrollColaMini.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+        JPanel panelExtremoDerecho = new JPanel(new BorderLayout(0, 4));
+        panelExtremoDerecho.setBackground(COLOR_PANEL);
+        panelExtremoDerecho.add(panelModo, BorderLayout.NORTH);       
+        panelExtremoDerecho.add(scrollColaMini, BorderLayout.SOUTH);  
 
         panel.add(panelInfo, BorderLayout.WEST);
         panel.add(panelControles, BorderLayout.CENTER);
         panel.add(panelModo, BorderLayout.EAST);
         return panel;
     }
-
+    
     private void accionCargarBiblioteca() {
         JFileChooser fc = new JFileChooser();
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -524,20 +599,35 @@ public class VentanaPrincipal extends JFrame {
 
     private void accionBuscar() {
 
-        String termino = txtBuscar.getText().trim();
-        if (termino.isEmpty()) { refrescarTablaBiblioteca(null); return; }
+            String termino = txtBuscar.getText().trim();
+        if (termino.isEmpty()) {
+            refrescarTablaBiblioteca(null);
+            return;
+        }
         String criterio = (String) comboBuscarPor.getSelectedItem();
         List<Cancion> resultado;
         switch (criterio) {
-            case "Artista": resultado = biblioteca.getAbb().buscarPorArtista(termino); break;
-            case "Álbum":   resultado = biblioteca.getAbb().buscarPorAlbum(termino);   break;
-            case "Género":  resultado = biblioteca.getAbb().buscarPorGenero(termino);  break;
+            case "Artista":
+                resultado = biblioteca.getAbb().buscarPorArtista(termino);
+                break;
+            case "Album":
+                resultado = biblioteca.getAbb().buscarPorAlbum(termino);
+                break;
+            case "Genero":
+                resultado = biblioteca.getAbb().buscarPorGenero(termino);
+                break;
             default: {
                 Cancion c = biblioteca.getAbb().buscar(termino);
                 resultado = c != null ? List.of(c) : List.of();
             }
         }
+        
         refrescarTablaBiblioteca(resultado);
+        estadisticas.medirBusqueda(termino);
+        lblEstABB.setText("ABB: " + biblioteca.getAbb().getTotalNodos() + " nodos | "
+                + String.format("%.4f ms", estadisticas.getUltimaBusquedaABB() / 1_000_000.0));
+        lblEstAVL.setText("AVL: " + biblioteca.getAvl().getTotalNodos() + " nodos | "
+                + String.format("%.4f ms", estadisticas.getUltimaBusquedaAVL() / 1_000_000.0));
     }
 
     private void accionReproducirSeleccionada() {
@@ -553,51 +643,46 @@ public class VentanaPrincipal extends JFrame {
         }
     }
 
-    private void accionAgregarACola() {
+       private void accionAgregarACola() {
         int fila = tablaBiblioteca.getSelectedRow();
         if (fila < 0) {
-            mostrarMensaje("Selecciona una cancion");
+            mostrarMensaje("Selecciona una cancion primero");
             return;
         }
         String nombre = (String) modeloBiblioteca.getValueAt(fila, 0);
-        Cancion c = biblioteca.getListaBiblioteca().buscar(
-                cancion -> cancion.getNombre().toLowerCase()
-                        .contains(nombre.toLowerCase())
-        );
+        Cancion c = biblioteca.getAbb().buscar(nombre);
         if (c != null) {
             reproductor.encolar(c);
             mostrarMensaje("Cancion agregada a la cola");
+            areaColaMini.setText(reproductor.getColaString());
         }
     }
 
     private void accionAgregarAPlaylist() {
         int fila = tablaBiblioteca.getSelectedRow();
         if (fila < 0) {
-            mostrarMensaje("Selecciona una cancion");
+            mostrarMensaje("Selecciona una canción primero.");
             return;
         }
         String nombre = (String) modeloBiblioteca.getValueAt(fila, 0);
-        Cancion c = biblioteca.getListaBiblioteca().buscar(
-                cancion -> cancion.getNombre().toLowerCase()
-                        .contains(nombre.toLowerCase())
-        );
+        Cancion c = biblioteca.getAbb().buscar(nombre);
         if (c == null) {
             return;
         }
         List<Playlist> todas = gestor.getTodas();
         if (todas.isEmpty()) {
-            mostrarMensaje("Crea una playlist");
+            mostrarMensaje("Primero crea una playlist");
             return;
         }
         String[] nombres = todas.stream().map(Playlist::getNombre).toArray(String[]::new);
-        String elegida = (String) JOptionPane.showInputDialog(this,"Selecciona la playlist:", "Agregar a Playlist",
-                JOptionPane.PLAIN_MESSAGE, null, nombres, nombres[0]);
+        String elegida = (String) JOptionPane.showInputDialog(this,"Selecciona la playlist:", "Agregar a Playlist", JOptionPane.PLAIN_MESSAGE, null, nombres, nombres[0]);
         if (elegida != null) {
             gestor.agregarCancion(elegida, c);
             mostrarMensaje("Cancion agregada a: " + elegida);
         }
     }
 
+    
     private void accionNuevaPlaylist() {
         String nombre = JOptionPane.showInputDialog(this, "Nombre de la nueva playlist:");
         if (nombre != null && !nombre.trim().isEmpty()) {
@@ -617,7 +702,36 @@ public class VentanaPrincipal extends JFrame {
             modeloPlaylist.setRowCount(0);
         }
     }
-
+    
+       private void accionExportarPlaylist() {
+        String sel = listaPlaylists.getSelectedValue();
+        if (sel == null) {
+            mostrarMensaje("Selecciona una playlist primero.");
+            return;
+        }
+        Playlist p = gestor.buscarPlaylist(sel);
+        JFileChooser fc = new JFileChooser();
+        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            boolean ok = GestorArchivos.exportarPlaylist(p, fc.getSelectedFile().getAbsolutePath());
+            mostrarMensaje(ok ? "Playlist exportada" : "Error al exportar");
+        }
+    }
+       
+         private void accionImportarPlaylist() {
+        JFileChooser fc = new JFileChooser();
+        if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            Playlist p = GestorArchivos.importarPlaylist(fc.getSelectedFile().getAbsolutePath());
+            if (p != null) {
+                gestor.crearPlaylist(p.getNombre());
+                refrescarListaPlaylists();
+                mostrarMensaje(" Playlist importada: " + p.getNombre());
+            } else {
+                mostrarMensaje(" Error al importar playlist");
+            }
+        }
+    }
+   
     private void accionQuitarCancionPlaylist() { String playlistSeleccionada = listaPlaylists.getSelectedValue();
     int filaSeleccionada = tablaPlaylist.getSelectedRow();
 
@@ -645,12 +759,10 @@ public class VentanaPrincipal extends JFrame {
         return;
     }
 
-    // Agrega todas las canciones a la cola
     for (Cancion cancion : playlist.getCanciones()) {
         reproductor.encolar(cancion);
     }
-
-    // Mantiene el modo circular si ya estaba activo
+    
     if (reproductor.getModo()
         != ReproductorMusical.ModoReproduccion.CIRCULAR) {
         reproductor.setModo( ReproductorMusical.ModoReproduccion.NORMAL);
@@ -698,32 +810,57 @@ public class VentanaPrincipal extends JFrame {
     private void mostrarComparativaCarga() {
         areaLog.setText(biblioteca.getResumenComparativaCarga());
     }
-
-    //  HELPERS DE UI
+    
+    
+    private void generarGraphviz(String arbol) {
+        JFileChooser fc = new JFileChooser();
+        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        if (fc.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        String dir = fc.getSelectedFile().getAbsolutePath();
+        String dot = arbol.equals("ABB")
+                ? VisualizadorArbol.generarDotABB(biblioteca.getAbb())
+                : VisualizadorArbol.generarDotAVL(biblioteca.getAvl());
+        String nombre = arbol.toLowerCase() + "_smartplayer";
+        String png = VisualizadorArbol.renderizarComoPNG(dot, nombre, dir);
+        if (png != null) {
+            mostrarMensaje("Imagen generada: " + png);
+        } else {
+            mostrarMensaje(" Archivo .dot guardado. Instala Graphviz para generar PNG");
+        }
+    }
+    
+    private void mostrarDuplicados() {
+        List<Cancion[]> dups = estadisticas.getDuplicados();
+        if (dups.isEmpty()) {
+            areaEstadisticas.setText("No se encontraron duplicados.");
+            return;
+        }
+        StringBuilder sb = new StringBuilder("=== DUPLICADOS DETECTADOS ===\n");
+        long totalBytes = 0;
+        for (Cancion[] par : dups) {
+            sb.append("• ").append(par[0].getNombre()).append("\n")
+                    .append("  Original : ").append(par[0].getRuta()).append("\n")
+                    .append("  Duplicado: ").append(par[1].getRuta()).append("\n")
+                    .append("  Tamaño   : ").append(par[1].getTamanoFormateado()).append("\n\n");
+            totalBytes += par[1].getTamano();
+        }
+        sb.append(String.format("Total duplicados: %d | Espacio desperdiciado: %.2f MB",
+                dups.size(), totalBytes / (1024.0 * 1024.0)));
+        areaEstadisticas.setText(sb.toString());
+    }
+    
     private void refrescarTablaBiblioteca(List<Cancion> canciones) {modeloBiblioteca.setRowCount(0);
     if (canciones == null) {
         for (Cancion c : biblioteca.getListaBiblioteca()) {modeloBiblioteca.addRow(new Object[]{
-                c.getNombre(),
-                c.getArtista(),
-                c.getAlbum(),
-                c.getGenero(),
-                c.getDuracionFormateada(),
-                c.getTamanoFormateado(),
-                c.getAnio(),
-                c.getRuta()
-            });
+          c.getNombre(), c.getArtista(), c.getAlbum(),c.getGenero(), c.getDuracionFormateada(), c.getTamanoFormateado(),c.getAnio(),
+                c.getRuta()});
         }
     } else {
         for (Cancion c : canciones) { modeloBiblioteca.addRow(new Object[]{
-                c.getNombre(),
-                c.getArtista(),
-                c.getAlbum(),
-                c.getGenero(),
-                c.getDuracionFormateada(),
-                c.getTamanoFormateado(),
-                c.getAnio(),
-                c.getRuta()
-            });
+            c.getNombre(), c.getArtista(), c.getAlbum(), c.getGenero(), c.getDuracionFormateada(), c.getTamanoFormateado(), c.getAnio(),
+                c.getRuta()});
         }
       }
     }
@@ -753,13 +890,13 @@ public class VentanaPrincipal extends JFrame {
     if (nombrePlaylist == null) {
         return;
     }
-    // Buscar playlist
+ 
     Playlist playlist = gestor.buscarPlaylist(nombrePlaylist);
 
     if (playlist == null) {
         return;
     }
-    // Mostrar canciones
+
     for (Cancion cancion : playlist.getCanciones()) {
         modeloPlaylist.addRow(new Object[]{
             cancion.getNombre(),
@@ -771,7 +908,7 @@ public class VentanaPrincipal extends JFrame {
        }
     }
     
-      private void actualizarEstadoArboles() {
+      private void actualizarEstadosArboles() {
         lblEstABB.setText("ABB: " + biblioteca.getAbb().getTotalNodos() +
                 " nodos | Altura: " + biblioteca.getAbb().altura());
         lblEstAVL.setText("AVL: " + biblioteca.getAvl().getTotalNodos() +
@@ -865,6 +1002,78 @@ public class VentanaPrincipal extends JFrame {
 
     private void mostrarMensaje(String msg) {
         JOptionPane.showMessageDialog(this, msg, "Smart Player", JOptionPane.INFORMATION_MESSAGE);
+    }
+     private EncriptadorPlaylist.TipoRecorrido getTipoRecorrido(int idx) {
+        switch (idx) {
+            case 1:
+                return EncriptadorPlaylist.TipoRecorrido.PRE_ORDEN;
+            case 2:
+                return EncriptadorPlaylist.TipoRecorrido.POST_ORDEN;
+            default:
+                return EncriptadorPlaylist.TipoRecorrido.IN_ORDEN;
+        }
+    }
+     
+     private void mostrarCancionActual() {
+        Cancion c = reproductor.getCancionActual();
+        if (c != null) {
+            lblCancionActual.setText(c.getNombre());
+            lblArtista.setText(c.getArtista() + " • " + c.getAlbum());
+        } else {
+            lblCancionActual.setText("Sin reproducción");
+            lblArtista.setText("—");
+        }
+    }
+
+    private void iniciarTimerProgreso() {
+
+        inicioReproduccion = System.currentTimeMillis();
+
+        if (timerProgreso != null) {
+            timerProgreso.stop();
+        }
+
+        timerProgreso = new Timer(1000, e -> {
+
+            Cancion c = reproductor.getCancionActual();
+
+            if (c == null) {
+                return;
+            }
+
+            long segundosActuales
+                    = (System.currentTimeMillis() - inicioReproduccion) / 1000;
+
+            long duracionTotal = (long) c.getDuracion();
+
+            if (duracionTotal <= 0) {
+                return;
+            }
+
+            int porcentaje = (int) ((segundosActuales * 100.0) / duracionTotal);
+
+            barraProgreso.setValue(
+                    Math.min(porcentaje, 100)
+            );
+
+            lblTiempo.setText(
+                    String.format("%02d:%02d",
+                            segundosActuales / 60,
+                            segundosActuales % 60)
+            );
+        });
+
+        timerProgreso.start();
+    }
+
+    private void detenerTimerProgreso() {
+
+        if (timerProgreso != null) {
+            timerProgreso.stop();
+        }
+
+        barraProgreso.setValue(0);
+        lblTiempo.setText("00:00");
     }
 
     public static void main(String[] args) {
