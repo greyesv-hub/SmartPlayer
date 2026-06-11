@@ -9,11 +9,9 @@ import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.engine.GraphvizCmdLineEngine;
 import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.parse.Parser;
-
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.Format;
 import smartplayer.structures.ArbolAVL;
 import smartplayer.structures.ArbolBinarioBusqueda;
 
@@ -22,16 +20,18 @@ import smartplayer.structures.ArbolBinarioBusqueda;
  * @author rmari
  */
 public class VisualizadorArbol {
-    
+
+
     public static String generarDotABB(ArbolBinarioBusqueda abb) {
         StringBuilder sb = new StringBuilder();
         sb.append("digraph ABB {\n");
         sb.append("  node [shape=ellipse, style=filled, fillcolor=\"#AED6F1\"];\n");
-        sb.append("  graph [label=\"Arbol Binario de Busqueda\", fontsize=16];\n");
+        sb.append("  graph [label=\"Árbol Binario de Búsqueda\", fontsize=16];\n");
         generarNodosABB(abb.getRaiz(), sb);
         sb.append("}\n");
         return sb.toString();
     }
+
     private static void generarNodosABB(ArbolBinarioBusqueda.Nodo n, StringBuilder sb) {
         if (n == null) return;
         String etiqueta = escapar(n.cancion.getNombre()) + "\\n" + escapar(n.cancion.getArtista());
@@ -47,8 +47,8 @@ public class VisualizadorArbol {
             generarNodosABB(n.derecho, sb);
         }
     }
-    
-     public static String generarDotAVL(ArbolAVL avl) {
+
+    public static String generarDotAVL(ArbolAVL avl) {
         StringBuilder sb = new StringBuilder();
         sb.append("digraph AVL {\n");
         sb.append("  node [shape=ellipse, style=filled, fillcolor=\"#A9DFBF\"];\n");
@@ -57,8 +57,8 @@ public class VisualizadorArbol {
         sb.append("}\n");
         return sb.toString();
     }
-     
-     private static void generarNodosAVL(ArbolAVL.Nodo n, StringBuilder sb) {
+
+    private static void generarNodosAVL(ArbolAVL.Nodo n, StringBuilder sb) {
         if (n == null) return;
         String etiqueta = escapar(n.cancion.getNombre()) + "\\nh=" + n.altura;
         sb.append("  \"").append(escapar(n.cancion.getNombre())).append("\" [label=\"").append(etiqueta).append("\"];\n");
@@ -73,7 +73,8 @@ public class VisualizadorArbol {
             generarNodosAVL(n.derecho, sb);
         }
     }
-     public static String renderizarComoPNG(String dotContent, String nombreArchivo, String carpetaSalida) {
+    
+    public static String renderizarComoPNG(String dotContent, String nombreArchivo, String carpetaSalida) {
         try {
             Files.createDirectories(Paths.get(carpetaSalida));
             
@@ -87,7 +88,7 @@ public class VisualizadorArbol {
                     .render(Format.PNG)
                     .toFile(new File(rutaPng));
 
-            return rutaPng; // Retorna la ruta del PNG creado de forma transparente
+            return rutaPng; 
             
         } catch (Exception e) {
             System.err.println("Error en la generación automática del PNG: " + e.getMessage()); e.printStackTrace();
