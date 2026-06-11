@@ -17,7 +17,6 @@ import smartplayer.player.GestorPlaylist;
  * @author rmari
  */
 public class EstadisticaMusical {
-    public class EstadisticasMusical {
 
        private final BibliotecaMusical biblioteca;
        private final GestorPlaylist   gestor;
@@ -25,7 +24,7 @@ public class EstadisticaMusical {
        private long ultimaBusquedaABB;
        private long ultimaBusquedaAVL;
 
-       public EstadisticasMusical(BibliotecaMusical b, GestorPlaylist g) {
+       public EstadisticaMusical(BibliotecaMusical b, GestorPlaylist g) {
         this.biblioteca = b;
         this.gestor     = g;
     }
@@ -174,4 +173,4 @@ public class EstadisticaMusical {
         public long getUltimaBusquedaABB() { return ultimaBusquedaABB; }
         public long getUltimaBusquedaAVL() { return ultimaBusquedaAVL; }
   }
-}
+
